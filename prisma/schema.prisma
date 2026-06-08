@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  label       String
+  description String?
+  order       Int       @default(0)
+  dishes      Dish[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Dish {
+  id              String        @id @default(cuid())
+  name            String
+  description     String
+  longDescription String
+  price           Float
+  originalPrice   Float?
+  discountPercent Int?
+  imageUrl        String?
+  popular         Boolean       @default(false)
+  spiceable       Boolean       @default(false)
+  feeds           Int           @default(1)
+  available       Boolean       @default(true)
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  supplements     Supplement[]
+  dishDrinks      DishDrink[]
+  dishDesserts    DishDessert[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Supplement {
+  id     String @id @default(cuid())
+  name   String
+  price  Float
+  dishId String
+  dish   Dish   @relation(fields: [dishId], references: [id], onDelete: Cascade)
+}
+
+model Drink {
+  id         String      @id @default(cuid())
+  name       String
+  price      Float
+  imageUrl   String?
+  available  Boolean     @default(true)
+  dishDrinks DishDrink[]
+  createdAt  DateTime    @default(now())
+}
+
+model Dessert {
+  id           String        @id @default(cuid())
+  name         String
+  price        Float
+  imageUrl     String?
+  available    Boolean       @default(true)
+  dishDesserts DishDessert[]
+  createdAt    DateTime      @default(now())
+}
+
+model DishDrink {
+  dishId  String
+  drinkId String
+  dish    Dish   @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  drink   Drink  @relation(fields: [drinkId], references: [id], onDelete: Cascade)
+
+  @@id([dishId, drinkId])
+}
+
+model DishDessert {
+  dishId    String
+  dessertId String
+  dish      Dish    @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  dessert   Dessert @relation(fields: [dessertId], references: [id], onDelete: Cascade)
+
+  @@id([dishId, dessertId])
+}
+
+model Order {
+  id        String   @id
+  amount    Float
+  items     String
+  phone     String?
+  address   String?
+  discount  Float?
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id             String  @id @default("default")
+  restaurantName String  @default("Nana-AfricanFood")
+  email          String  @default("hello@nanafood.com")
+  phone          String  @default("+1 (720) 000-0000")
+  address        String  @default("Denver, CO 80202")
+  hours          String  @default("Mon–Sun · 11am – 10pm")
+  taxRate        Float   @default(8.81)
+  instagram      String  @default("")
+  facebook       String  @default("")
+  whatsapp       String  @default("")
+  tiktok         String  @default("")
+}
