@@ -9,9 +9,9 @@ export default function Footer() {
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
 
-  const nameParts = settings.restaurantName.split("-");
-  const before = nameParts[0] + (nameParts.length > 1 ? "-" : "");
-  const after = nameParts.slice(1).join("-");
+  const highlightIdx = settings.restaurantName.toLowerCase().indexOf("african foods");
+  const before = highlightIdx >= 0 ? settings.restaurantName.slice(0, highlightIdx) : settings.restaurantName;
+  const after = highlightIdx >= 0 ? settings.restaurantName.slice(highlightIdx) : "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,19 +48,19 @@ export default function Footer() {
   };
 
   return (
-    <footer id="contact" style={{ background: "#743306", borderTop: "1px solid rgba(219,146,23,0.25)", marginTop: "3rem" }}>
-      <div style={{ maxWidth: "1300px", margin: "0 auto", padding: "3.5rem 1vw 2rem" }}>
+    <footer id="contact" className="site-footer" style={{ background: "#743306", borderTop: "1px solid rgba(219,146,23,0.25)", marginTop: "3rem" }}>
+      <div className="footer-inner" style={{ maxWidth: "1300px", margin: "0 auto", padding: "3.5rem 3rem 2rem" }}>
 
         {/* Top grid — 4 colonnes compactes */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 0.8fr 1fr 1.2fr", gap: "2.5rem", marginBottom: "2.5rem", alignItems: "start" }}>
+        <div className="site-footer-grid" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1.2fr", gap: "2.5rem", marginBottom: "2.5rem", alignItems: "start" }}>
 
           {/* Brand */}
-<div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+<div className="footer-brand-col" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
   <a href="/" style={{ fontFamily: "var(--font-playfair)", fontWeight: 900, fontSize: "1.3rem", textDecoration: "none", whiteSpace: "nowrap", display: "inline-block" }}>
     <span style={{ color: "#ECD8B6" }}>{before}</span>
     <span style={{ color: "#FFA309" }}>{after}</span>
   </a>
-  <p style={{ fontFamily: "var(--font-dm)", fontWeight: 300, fontSize: "0.8rem", color: "rgba(236,216,182,0.70)", lineHeight: 1.8, maxWidth: "200px" }}>
+  <p className="footer-brand-text" style={{ fontFamily: "var(--font-dm)", fontWeight: 300, fontSize: "0.8rem", color: "rgba(236,216,182,0.70)", lineHeight: 1.8, maxWidth: "200px" }}>
     Authentic West African cuisine, crafted with love in Denver, CO.
   </p>
   {socialLinks.length > 0 && (
@@ -76,43 +76,23 @@ export default function Footer() {
       ))}
     </div>
   )}
-  <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", background: "rgba(236,216,182,0.10)", border: "1px solid rgba(236,216,182,0.20)", color: "#ECD8B6", fontFamily: "var(--font-dm)", fontSize: "0.7rem", fontWeight: 500, padding: "0.35rem 0.75rem", borderRadius: "100px", width: "fit-content" }}>
+  <span className="footer-hours-badge" style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", background: "rgba(236,216,182,0.10)", border: "1px solid rgba(236,216,182,0.20)", color: "#ECD8B6", fontFamily: "var(--font-dm)", fontSize: "0.7rem", fontWeight: 500, padding: "0.35rem 0.75rem", borderRadius: "100px", width: "fit-content" }}>
     <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", display: "inline-block", flexShrink: 0 }} />
     {settings.hours}
   </span>
 </div>
 
-{/* Navigate + Follow */}
-<div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-  <p style={{ fontFamily: "var(--font-dm)", fontWeight: 600, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.16em", color: "#FFA309", marginBottom: "0.25rem" }}>Navigate</p>
-  {[{ label: "Menu", href: "#menu" }, { label: "Contact", href: "#contact" }].map(({ label, href }) => (
-    <a key={label} href={href} style={{ fontFamily: "var(--font-dm)", fontSize: "0.82rem", color: "rgba(236,216,182,0.65)", textDecoration: "none", transition: "color 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#ECD8B6")} onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(236,216,182,0.65)")}>
-      {label}
-    </a>
-  ))}
-  {socialLinks.length > 0 && (
-    <>
-      <p style={{ fontFamily: "var(--font-dm)", fontWeight: 600, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.16em", color: "#FFA309", marginTop: "1rem", marginBottom: "0.25rem" }}>Follow</p>
-      {socialLinks.map(({ key, label, url }) => (
-        <a key={key} href={url!} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-dm)", fontSize: "0.82rem", color: "rgba(236,216,182,0.65)", textDecoration: "none", transition: "color 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#FFA309")} onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(236,216,182,0.65)")}>
-          {label}
-        </a>
-      ))}
-    </>
-  )}
-</div>
-
 {/* Contact */}
-<div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-  <p style={{ fontFamily: "var(--font-dm)", fontWeight: 600, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.16em", color: "#FFA309", marginBottom: "0.25rem" }}>Contact</p>
+<div className="footer-contact-col" style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+  <p className="footer-col-label" style={{ fontFamily: "var(--font-dm)", fontWeight: 600, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.16em", color: "#FFA309", marginBottom: "0.25rem" }}>Contact</p>
   {[settings.address, settings.email, settings.phone].map((line) => (
-    <p key={line} style={{ fontFamily: "var(--font-dm)", fontSize: "0.82rem", color: "rgba(236,216,182,0.65)", fontWeight: 300, lineHeight: 1.5 }}>{line}</p>
+    <p key={line} className="footer-contact-text" style={{ fontFamily: "var(--font-dm)", fontSize: "0.82rem", color: "rgba(236,216,182,0.65)", fontWeight: 300, lineHeight: 1.5 }}>{line}</p>
   ))}
 </div>
 
 {/* Message form */}
-<div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-  <p style={{ fontFamily: "var(--font-dm)", fontWeight: 600, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.16em", color: "#FFA309", marginBottom: "0.1rem" }}>Message</p>
+<div className="footer-message-col" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+  <p className="footer-col-label" style={{ fontFamily: "var(--font-dm)", fontWeight: 600, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.16em", color: "#FFA309", marginBottom: "0.1rem" }}>Message</p>
   {sent ? (
     <div style={{ padding: "0.875rem", borderRadius: "10px", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.30)", color: "#22c55e", fontFamily: "var(--font-dm)", fontSize: "0.82rem", fontWeight: 500, textAlign: "center" }}>
       Sent — we'll be in touch!
@@ -131,11 +111,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "1.25rem", borderTop: "1px solid rgba(236,216,182,0.12)", flexWrap: "wrap", gap: "0.5rem" }}>
-          <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.75rem", color: "rgba(236,216,182,0.40)", fontWeight: 300 }}>
+        <div className="site-footer-bottom" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "1.25rem", borderTop: "1px solid rgba(236,216,182,0.12)", flexWrap: "wrap", gap: "0.5rem" }}>
+          <p className="footer-bottom-text" style={{ fontFamily: "var(--font-dm)", fontSize: "0.75rem", color: "rgba(236,216,182,0.40)", fontWeight: 300 }}>
             © {new Date().getFullYear()} {settings.restaurantName}. All rights reserved.
           </p>
-          <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.75rem", color: "rgba(236,216,182,0.40)", fontWeight: 300 }}>
+          <p className="footer-bottom-text" style={{ fontFamily: "var(--font-dm)", fontSize: "0.75rem", color: "rgba(236,216,182,0.40)", fontWeight: 300 }}>
             Made by NaLabs
           </p>
         </div>

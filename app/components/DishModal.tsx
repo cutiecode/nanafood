@@ -80,7 +80,7 @@ export default function DishModal({ dish, isOpen, onClose }: Props) {
               <span
                 className="font-playfair font-bold text-center px-8"
                 style={{
-                  fontSize: "clamp(1.4rem, 4vw, 2rem)",
+                  fontSize: "1.7rem",
                   color: "rgba(232,99,26,0.4)",
                 }}
               >

@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const supplements = await prisma.supplement.findMany({
       distinct: ["name"],
-      orderBy: { name: "asc" },
+      orderBy: { createdAt: "desc" },
       take: 10,
     });
     return NextResponse.json(supplements);

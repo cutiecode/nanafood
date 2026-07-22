@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 
 type Order = {
   id: string;
+  orderNumber?: string;
   amount: number;
   items: string;
   phone?: string;
@@ -73,7 +74,7 @@ export default function AdminOrders() {
   const periodFiltered = filterByPeriod(allOrders, period);
   const filtered = search.trim()
     ? periodFiltered.filter((o) =>
-        o.id.toLowerCase().includes(search.toLowerCase()) ||
+        (o.orderNumber || o.id).toLowerCase().includes(search.toLowerCase()) ||
         o.items?.toLowerCase().includes(search.toLowerCase()) ||
         o.amount.toString().includes(search) ||
         o.address?.toLowerCase().includes(search.toLowerCase()) ||
@@ -210,7 +211,7 @@ export default function AdminOrders() {
                   <div style={{ padding: "1.25rem 1.5rem 1.5rem", borderTop: "1px solid rgba(219,146,23,0.15)", background: "rgba(236,216,182,0.15)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
                     <div>
                       <p style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.14em", color: "#DB9217", marginBottom: "0.4rem" }}>Order ID</p>
-                      <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#743306", fontWeight: 400, wordBreak: "break-all" }}>{order.id}</p>
+                      <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#743306", fontWeight: 400, wordBreak: "break-all" }}>{order.orderNumber || order.id}</p>
                     </div>
 
                     <div>

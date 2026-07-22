@@ -88,6 +88,29 @@ export async function normalizeDishPayload(body: DishPayloadInput): Promise<Dish
     return { ok: false, status: 400, error: "Dish price must be a valid number greater than 0." };
   }
 
+  if (body.originalPrice !== null && body.originalPrice !== undefined && body.originalPrice !== "") {
+    const originalPriceValue = Number(body.originalPrice);
+    if (!Number.isFinite(originalPriceValue) || originalPriceValue < 0) {
+      return { ok: false, status: 400, error: "Original price can't be negative." };
+    }
+  }
+
+  if (body.discountPercent !== null && body.discountPercent !== undefined && body.discountPercent !== "") {
+    const discountValue = Number(body.discountPercent);
+    if (!Number.isFinite(discountValue) || discountValue < 0) {
+      return { ok: false, status: 400, error: "Discount can't be negative." };
+    }
+  }
+
+  if (Array.isArray(body.supplements)) {
+    const hasNegativeSupplement = body.supplements.some(
+      (supplement) => supplement?.price !== null && supplement?.price !== undefined && Number(supplement.price) < 0
+    );
+    if (hasNegativeSupplement) {
+      return { ok: false, status: 400, error: "Add-on price can't be negative." };
+    }
+  }
+
   const categoryId = typeof body.categoryId === "string" ? body.categoryId.trim() : "";
   if (!categoryId) {
     return { ok: false, status: 400, error: "A valid category is required before saving a dish." };

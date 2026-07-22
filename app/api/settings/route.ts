@@ -19,6 +19,9 @@ export async function GET() {
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
+    if (Number(body.taxRate) < 0 || isNaN(Number(body.taxRate))) {
+      return NextResponse.json({ error: "Tax rate can't be negative." }, { status: 400 });
+    }
     const settings = await prisma.settings.upsert({
       where: { id: "default" },
       update: {

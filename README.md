@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NanaFood — West African Restaurant App
 
-## Getting Started
+Stack: Next.js 15, TypeScript, Tailwind CSS v4, Prisma v7 + SQLite, Stripe, Resend
 
-First, run the development server:
+## Installation sur un nouvel ordinateur
 
+### 1. Prérequis
+Installe dans cet ordre :
+- [Node.js LTS](https://nodejs.org) — v20+
+- [Git](https://git-scm.com)
+- [Stripe CLI](https://stripe.com/docs/stripe-cli)
+
+### 2. Cloner le projet
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/TON_USERNAME/TON_REPO.git
+cd TON_REPO
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Installer les dépendances
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Variables d'environnement
+Crée un fichier `.env.local` à la racine : 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+DATABASE_URL="file:./prisma/dev.db"
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+ADMIN_PASSWORD=ton_mot_de_passe_admin
+RESEND_API_KEY=re_...
+CONTACT_EMAIL=ton@email.com
 
-## Learn More
+### 5. Base de données
+```bash
+npx prisma migrate deploy
+npx prisma generate
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 6. Lancer le projet
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 7. Stripe webhook (terminal séparé)
+```bash
+stripe listen --forward-to localhost:3000/api/webhook
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Structure du projet
+- `app/` — pages et composants Next.js
+- `app/api/` — routes API
+- `app/components/` — composants réutilisables
+- `app/context/` — CartContext, SettingsContext
+- `app/admin/` — back office admin
+- `prisma/` — schéma et migrations DB
+- `public/` — images statiques (dont nanabg.png)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Variables d'environnement requises
+| Variable | Description |
+|---|---|
+| DATABASE_URL | Chemin SQLite local |
+| STRIPE_SECRET_KEY | Clé secrète Stripe |
+| STRIPE_WEBHOOK_SECRET | Secret webhook Stripe CLI |
+| ADMIN_PASSWORD | Mot de passe back office |
+| RESEND_API_KEY | Clé API Resend (emails) |
+| CONTACT_EMAIL | Email qui reçoit les messages |

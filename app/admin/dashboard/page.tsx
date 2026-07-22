@@ -5,6 +5,7 @@ import { ShoppingBag, DollarSign, TrendingUp, CalendarDays } from "lucide-react"
 
 type Order = {
   id: string;
+  orderNumber?: string;
   amount: number;
   items: string;
   createdAt: string;
@@ -189,7 +190,7 @@ export default function AdminDashboard() {
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <td style={{ padding: "1rem 1.5rem", fontFamily: "var(--font-dm)", fontSize: "0.78rem", color: "#DB9217", whiteSpace: "nowrap" }}>
-                      {order.id.slice(0, 20)}...
+                      {order.orderNumber || `${order.id.slice(0, 20)}...`}
                     </td>
                     <td style={{ padding: "1rem 1.5rem", fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#743306", maxWidth: "240px" }}>
                       {truncate(order.items, 40)}

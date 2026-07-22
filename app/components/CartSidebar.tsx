@@ -42,7 +42,7 @@ export default function CartSidebar() {
 
       <div className="cart-sidebar-panel" style={{
         position: "fixed", top: 0, right: 0, height: "100dvh", zIndex: 51,
-        width: "min(480px, 100vw)",
+        width: "min(480px, 100%)",
         background: "#FDF6EC",
         borderLeft: "1px solid rgba(219,146,23,0.30)",
         boxShadow: "-8px 0 40px rgba(116,51,6,0.15)",

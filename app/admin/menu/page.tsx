@@ -49,6 +49,7 @@ export default function AdminMenu() {
   const [availableDrinks, setAvailableDrinks] = useState<Drink[]>([]);
   const [availableDesserts, setAvailableDesserts] = useState<Dessert[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [formError, setFormError] = useState("");
 
   useEffect(() => { fetchData(); }, []);
 
@@ -62,7 +63,7 @@ export default function AdminMenu() {
       ]);
       setCategories(Array.isArray(catData) ? catData : []);
       setDishes(Array.isArray(menuData) ? menuData : []);
-      setGlobalSupplements(Array.isArray(supData) ? [...supData].reverse().slice(0, 10) : []);
+      setGlobalSupplements(Array.isArray(supData) ? supData : []);
       setAvailableDrinks(Array.isArray(drinkData) ? drinkData : []);
       setAvailableDesserts(Array.isArray(dessertData) ? dessertData : []);
     } catch (error) { console.error("Failed to fetch data:", error); }
@@ -130,6 +131,8 @@ export default function AdminMenu() {
 
   const addSupplement = () => {
     if (!supplementInput.name || !supplementInput.price) return;
+    if (parseFloat(supplementInput.price) < 0) { setFormError("Add-on price can't be negative."); return; }
+    setFormError("");
     const newSup: Supplement = { id: supplementInput.name.toLowerCase().replace(/\s+/g, "-"), name: supplementInput.name, price: parseFloat(supplementInput.price) };
     setDishForm((prev) => ({ ...prev, supplements: [...(prev.supplements || []), newSup] }));
     setSupplementInput({ name: "", price: "" });
@@ -164,15 +167,19 @@ export default function AdminMenu() {
       if (isAddingDish) {
         const res = await fetch("/api/menu", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         const newDish = await res.json();
-        if (!res.ok) { console.error("Error:", newDish.error); return; }
+        if (!res.ok) { setFormError(newDish.error || "Failed to save dish."); return; }
         setDishes((prev) => [...prev, newDish]);
       } else if (editingDishId) {
         const res = await fetch(`/api/menu/${editingDishId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         const updated = await res.json();
-        if (!res.ok) { console.error("Error:", updated.error); return; }
+        if (!res.ok) { setFormError(updated.error || "Failed to save dish."); return; }
         setDishes((prev) => prev.map((d) => d.id === editingDishId ? updated : d));
       }
-    } catch (error) { console.error("Failed to save dish:", error); }
+      const supRes = await fetch("/api/supplements");
+      const supData = await supRes.json();
+      setGlobalSupplements(Array.isArray(supData) ? supData : []);
+    } catch (error) { console.error("Failed to save dish:", error); setFormError("Failed to save dish."); return; }
+    setFormError("");
     resetDishForm();
   };
 
@@ -400,6 +407,12 @@ export default function AdminMenu() {
             </button>
           </div>
 
+          {formError && (
+            <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#C23D0C", background: "rgba(194,61,12,0.08)", border: "1px solid rgba(194,61,12,0.25)", borderRadius: "8px", padding: "0.6rem 1rem" }}>
+              {formError}
+            </p>
+          )}
+
           <div className="admin-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             <div>
               <label style={labelStyle}>Name</label>
@@ -407,15 +420,15 @@ export default function AdminMenu() {
             </div>
             <div>
               <label style={labelStyle}>Feeds (number of people)</label>
-              <input style={{ ...inputStyle, appearance: "none" }} type="number" min="1" value={dishForm.feeds ?? ""} onChange={(e) => { const val = parseInt(e.target.value); if (e.target.value === "") { setDishForm((p) => ({ ...p, feeds: undefined })); } else if (val >= 1) { setDishForm((p) => ({ ...p, feeds: val })); } }} placeholder="Number of persons" onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
+              <input style={{ ...inputStyle, appearance: "none" }} type="number" min="1" value={dishForm.feeds ?? ""} onChange={(e) => { const val = parseInt(e.target.value); if (e.target.value === "") { setDishForm((p) => ({ ...p, feeds: undefined })); return; } if (val < 1 || isNaN(val)) { setFormError("Feeds must be at least 1."); return; } setFormError(""); setDishForm((p) => ({ ...p, feeds: val })); }} placeholder="Number of persons" onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
             </div>
             <div>
               <label style={labelStyle}>Base Price ($)</label>
-              <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.01" min="0" value={dishForm.originalPrice ?? dishForm.price ?? ""} onChange={(e) => { const basePrice = parseFloat(e.target.value); if (isNaN(basePrice)) { setDishForm((p) => ({ ...p, price: undefined, originalPrice: undefined })); return; } const discount = (dishForm as any).discountAmount || 0; const newPrice = discount ? parseFloat((basePrice - discount).toFixed(2)) : basePrice; const percent = discount && basePrice ? Math.round((discount / basePrice) * 100) : undefined; setDishForm((p) => ({ ...p, originalPrice: discount ? basePrice : undefined, price: newPrice > 0 ? newPrice : basePrice, discountPercent: percent })); }} placeholder="Price before discount" onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
+              <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.01" min="0" value={dishForm.originalPrice ?? dishForm.price ?? ""} onChange={(e) => { const basePrice = parseFloat(e.target.value); if (isNaN(basePrice)) { setDishForm((p) => ({ ...p, price: undefined, originalPrice: undefined })); return; } if (basePrice < 0) { setFormError("Price can't be negative."); return; } setFormError(""); const discount = (dishForm as any).discountAmount || 0; const newPrice = discount ? parseFloat((basePrice - discount).toFixed(2)) : basePrice; const percent = discount && basePrice ? Math.round((discount / basePrice) * 100) : undefined; setDishForm((p) => ({ ...p, originalPrice: discount ? basePrice : undefined, price: newPrice > 0 ? newPrice : basePrice, discountPercent: percent })); }} placeholder="Price before discount" onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
             </div>
             <div>
               <label style={labelStyle}>Discount ($) <span style={{ color: "#DB9217", fontWeight: 300, textTransform: "none", letterSpacing: 0, marginLeft: "0.5rem", fontSize: "10px" }}>leave empty for no discount</span></label>
-              <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.01" min="0" value={(dishForm as any).discountAmount ?? ""} onChange={(e) => { const discount = parseFloat(e.target.value); const basePrice = dishForm.originalPrice || dishForm.price || 0; if (!discount || isNaN(discount)) { setDishForm((p) => ({ ...p, originalPrice: undefined, discountPercent: undefined, discountAmount: undefined, price: basePrice })); return; } if (discount >= basePrice) return; const newPrice = parseFloat((basePrice - discount).toFixed(2)); const percent = Math.round((discount / basePrice) * 100); setDishForm((p) => ({ ...p, originalPrice: basePrice, price: newPrice > 0 ? newPrice : basePrice, discountPercent: percent, discountAmount: discount })); }} placeholder="Discount amount" onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
+              <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.01" min="0" value={(dishForm as any).discountAmount ?? ""} onChange={(e) => { const discount = parseFloat(e.target.value); const basePrice = dishForm.originalPrice || dishForm.price || 0; if (!discount || isNaN(discount)) { setDishForm((p) => ({ ...p, originalPrice: undefined, discountPercent: undefined, discountAmount: undefined, price: basePrice })); return; } if (discount < 0) { setFormError("Discount can't be negative."); return; } setFormError(""); if (discount >= basePrice) return; const newPrice = parseFloat((basePrice - discount).toFixed(2)); const percent = Math.round((discount / basePrice) * 100); setDishForm((p) => ({ ...p, originalPrice: basePrice, price: newPrice > 0 ? newPrice : basePrice, discountPercent: percent, discountAmount: discount })); }} placeholder="Discount amount" onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
             </div>
           </div>
 

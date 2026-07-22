@@ -141,7 +141,7 @@ export default function DishPage() {
             ) : (
               <>
                 <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #743306 1px, transparent 1px)", backgroundSize: "24px 24px", opacity: 0.04 }} />
-                <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "clamp(1.5rem, 4vw, 2.5rem)", color: "rgba(194,61,12,0.35)", textAlign: "center", padding: "0 2rem", position: "relative", zIndex: 1 }}>{dish.name}</span>
+                <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "2rem", color: "rgba(194,61,12,0.35)", textAlign: "center", padding: "0 2rem", position: "relative", zIndex: 1 }}>{dish.name}</span>
               </>
             )}
             {dish.popular && (
