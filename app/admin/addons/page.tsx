@@ -19,6 +19,7 @@ export default function AdminAddons() {
   const [uploadingNew, setUploadingNew] = useState<{ drink: boolean; dessert: boolean }>({ drink: false, dessert: false });
   const [newDrinkImage, setNewDrinkImage] = useState("");
   const [newDessertImage, setNewDessertImage] = useState("");
+  const [formError, setFormError] = useState("");
 
   useEffect(() => { fetchData(); }, []);
 
@@ -42,6 +43,8 @@ export default function AdminAddons() {
 
   const addDrink = async () => {
     if (!newDrink.name || !newDrink.price) return;
+    if (parseFloat(newDrink.price) < 0) { setFormError("Price can't be negative."); return; }
+    setFormError("");
     const res = await fetch("/api/drinks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: newDrink.name, price: parseFloat(newDrink.price), imageUrl: newDrinkImage || null }) });
     const created = await res.json();
     setDrinks((prev) => [...prev, created]);
@@ -50,6 +53,8 @@ export default function AdminAddons() {
   };
 
   const updateDrink = async (id: string) => {
+    if (parseFloat(drinkEditForm.price) < 0) { setFormError("Price can't be negative."); return; }
+    setFormError("");
     const res = await fetch("/api/drinks", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, name: drinkEditForm.name, price: parseFloat(drinkEditForm.price), imageUrl: drinkEditForm.imageUrl || null }) });
     const updated = await res.json();
     setDrinks((prev) => prev.map((d) => d.id === id ? updated : d));
@@ -63,6 +68,8 @@ export default function AdminAddons() {
 
   const addDessert = async () => {
     if (!newDessert.name || !newDessert.price) return;
+    if (parseFloat(newDessert.price) < 0) { setFormError("Price can't be negative."); return; }
+    setFormError("");
     const res = await fetch("/api/desserts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: newDessert.name, price: parseFloat(newDessert.price), imageUrl: newDessertImage || null }) });
     const created = await res.json();
     setDesserts((prev) => [...prev, created]);
@@ -71,6 +78,8 @@ export default function AdminAddons() {
   };
 
   const updateDessert = async (id: string) => {
+    if (parseFloat(dessertEditForm.price) < 0) { setFormError("Price can't be negative."); return; }
+    setFormError("");
     const res = await fetch("/api/desserts", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, name: dessertEditForm.name, price: parseFloat(dessertEditForm.price), imageUrl: dessertEditForm.imageUrl || null }) });
     const updated = await res.json();
     setDesserts((prev) => prev.map((d) => d.id === id ? updated : d));
@@ -142,7 +151,7 @@ export default function AdminAddons() {
                 <div style={{ padding: "1rem", borderRadius: "10px", background: `${accentColor}10`, border: `1px solid ${accentColor}33`, display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                     <input style={inputStyle} value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} placeholder="Name" onFocus={(e) => (e.currentTarget.style.borderColor = `${accentColor}88`)} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
-                    <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.25" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} placeholder="Price" onFocus={(e) => (e.currentTarget.style.borderColor = `${accentColor}88`)} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
+                    <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.25" min="0" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} placeholder="Price" onFocus={(e) => (e.currentTarget.style.borderColor = `${accentColor}88`)} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
                   </div>
                   {editForm.imageUrl && (
                     <div style={{ position: "relative", width: "100%", height: "120px", borderRadius: "8px", overflow: "hidden", border: `1px solid ${accentColor}44` }}>
@@ -228,7 +237,7 @@ export default function AdminAddons() {
             />
             <input
               style={{ ...inputStyle, flex: 1, appearance: "none" }}
-              placeholder="$0.00" type="number" step="0.25"
+              placeholder="$0.00" type="number" step="0.25" min="0"
               value={newItem.price}
               onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
               onKeyDown={(e) => e.key === "Enter" && onAdd()}
@@ -277,6 +286,12 @@ export default function AdminAddons() {
           Manage your drinks and desserts — with photos, prices and names.
         </p>
       </div>
+
+      {formError && (
+        <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#C23D0C", background: "rgba(194,61,12,0.08)", border: "1px solid rgba(194,61,12,0.25)", borderRadius: "8px", padding: "0.6rem 1rem" }}>
+          {formError}
+        </p>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "2rem" }}>
         {renderSection("Drinks", "Beverages available on the site", "#E85E00", drinks, editingDrink, setEditingDrink, drinkEditForm, setDrinkEditForm, updateDrink, deleteDrink, addDrink, newDrink, setNewDrink, newDrinkImage, setNewDrinkImage, "drink", "e.g. Bissap, Ginger lemonade...")}

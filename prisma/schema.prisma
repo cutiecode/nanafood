@@ -39,11 +39,12 @@ model Dish {
 }
 
 model Supplement {
-  id     String @id @default(cuid())
-  name   String
-  price  Float
-  dishId String
-  dish   Dish   @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  dishId    String
+  dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 model Drink {
@@ -85,13 +86,14 @@ model DishDessert {
 }
 
 model Order {
-  id        String   @id
-  amount    Float
-  items     String
-  phone     String?
-  address   String?
-  discount  Float?
-  createdAt DateTime @default(now())
+  id          String   @id
+  orderNumber String?
+  amount      Float
+  items       String
+  phone       String?
+  address     String?
+  discount    Float?
+  createdAt   DateTime @default(now())
 }
 
 model Settings {

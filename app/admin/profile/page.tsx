@@ -60,6 +60,10 @@ export default function AdminProfile() {
   const handleRestaurantSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setRestaurantError("");
+    if (parseFloat(settings.taxRate) < 0 || isNaN(parseFloat(settings.taxRate))) {
+      setRestaurantError("Tax rate can't be negative.");
+      return;
+    }
     setIsSavingSettings(true);
     try {
       const res = await fetch("/api/settings", {
@@ -149,7 +153,7 @@ export default function AdminProfile() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "2rem", maxWidth: "700px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "2rem", maxWidth: "700px", margin: "0 auto" }}>
 
       {/* Header */}
       <div>
@@ -223,7 +227,7 @@ export default function AdminProfile() {
                 Tax Rate (%)
                 <span style={{ color: "#DB9217", fontWeight: 300, textTransform: "none", letterSpacing: 0, marginLeft: "0.5rem", fontSize: "10px" }}>Denver default: 8.81%</span>
               </label>
-              <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.01" value={settings.taxRate} onChange={(e) => setSettings((p) => ({ ...p, taxRate: e.target.value }))} onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
+              <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.01" min="0" value={settings.taxRate} onChange={(e) => setSettings((p) => ({ ...p, taxRate: e.target.value }))} onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
             </div>
           </div>
 

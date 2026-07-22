@@ -37,9 +37,15 @@ export async function POST(req: NextRequest) {
         ? session.total_details.amount_discount / 100
         : null;
 
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const ordersToday = await prisma.order.count({ where: { createdAt: { gte: startOfDay } } });
+      const orderNumber = `O${ordersToday + 1}A${String(now.getFullYear()).slice(-2)}M${now.getMonth() + 1}J${now.getDate()}`;
+
       await prisma.order.create({
         data: {
           id: session.id,
+          orderNumber,
           amount: (session.amount_total || 0) / 100,
           items,
           phone: session.customer_details?.phone || null,

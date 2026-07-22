@@ -27,14 +27,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const SidebarContent = () => {
     const settings = useSettings();
-    const nameParts = settings.restaurantName.split("-");
-    const before = nameParts[0] + (nameParts.length > 1 ? "-" : "");
-    const after = nameParts.slice(1).join("-");
+    const highlightIdx = settings.restaurantName.toLowerCase().indexOf("african foods");
+    const before = highlightIdx >= 0 ? settings.restaurantName.slice(0, highlightIdx) : settings.restaurantName;
+    const after = highlightIdx >= 0 ? settings.restaurantName.slice(highlightIdx) : "";
 
     return (
       <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "2rem 1.25rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.35rem" }}>
-          <a href="/" style={{ fontFamily: "var(--font-playfair)", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.4rem)", textDecoration: "none", whiteSpace: "nowrap", display: "inline-block" }}>
+          <a href="/" style={{ fontFamily: "var(--font-playfair)", fontWeight: 900, fontSize: "1.1rem", textDecoration: "none", whiteSpace: "nowrap", display: "inline-block" }}>
             <span style={{ color: "#ECD8B6" }}>{before}</span>
             <span style={{ color: "#FFA309" }}>{after}</span>
           </a>

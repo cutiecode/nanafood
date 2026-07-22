@@ -8,9 +8,9 @@ export default function OrderSuccess() {
   const router = useRouter();
   const settings = useSettings();
 
-  const nameParts = settings.restaurantName.split("-");
-  const before = nameParts[0] + (nameParts.length > 1 ? "-" : "");
-  const after = nameParts.slice(1).join("-");
+  const highlightIdx = settings.restaurantName.toLowerCase().indexOf("african foods");
+  const before = highlightIdx >= 0 ? settings.restaurantName.slice(0, highlightIdx) : settings.restaurantName;
+  const after = highlightIdx >= 0 ? settings.restaurantName.slice(highlightIdx) : "";
 
   return (
     <div style={{ minHeight: "100vh", background: "#FAF6F0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem" }}>

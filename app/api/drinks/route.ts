@@ -17,6 +17,9 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { name, price, imageUrl } = await req.json();
+    if (Number(price) < 0 || isNaN(Number(price))) {
+      return NextResponse.json({ error: "Price can't be negative." }, { status: 400 });
+    }
     const drink = await prisma.drink.create({
       data: { name, price: Number(price), imageUrl: imageUrl || null },
     });
@@ -30,6 +33,9 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const { id, name, price, imageUrl } = await req.json();
+    if (Number(price) < 0 || isNaN(Number(price))) {
+      return NextResponse.json({ error: "Price can't be negative." }, { status: 400 });
+    }
     const drink = await prisma.drink.update({
       where: { id },
       data: { name, price: Number(price), imageUrl: imageUrl || null },

@@ -17,30 +17,30 @@ export default function Hero() {
   };
 
   return (
-    <section className="hero-section" style={{ position: "relative", height: "100vh", minHeight: "100svh", width: "100%", display: "flex", alignItems: "center", overflow: "hidden", background: "#F5EDE0" }}>
+    <section className="hero-section" style={{ position: "relative", width: "100%", marginTop: "56px", aspectRatio: "1536 / 1024", overflow: "hidden", background: "#F5EDE0" }}>
       <div className="hero-background" style={{ position: "absolute", inset: 0, zIndex: 0, backgroundImage: "url('/nanabg.png')", backgroundSize: "cover", backgroundPosition: "right center", backgroundRepeat: "no-repeat" }} />
 
-      <div className="hero-gradient" style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(90deg, rgba(245,237,224,1) 0%, rgba(245,237,224,0.97) 28%, rgba(245,237,224,0.7) 48%, rgba(245,237,224,0.1) 65%, transparent 100%)" }} />
+      <div className="hero-gradient" style={{ position: "absolute", inset: 0, zIndex: 1, background: "none" }} />
 
-      <div className="hero-content" style={{ position: "relative", zIndex: 2, width: "55%", maxWidth: "760px", padding: "0 0 0 6vw", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center", height: "100%" }}>
+      <div className="hero-content" style={{ position: "absolute", inset: 0, zIndex: 2, width: "55%", maxWidth: "760px", padding: "0 0 0 4rem", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center" }}>
         <h1 style={{ fontFamily: "var(--font-playfair)", fontWeight: 900, lineHeight: 1.0, letterSpacing: "-0.02em", marginBottom: "3rem" }}>
-          <span style={{ display: "block", color: "#1A0A00", fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}>The Taste of</span>
-          <span style={{ display: "block", background: "linear-gradient(135deg, #C23D0C 0%, #E85E00 60%, #DB9217 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontSize: "clamp(3rem, 6.5vw, 7.5rem)", lineHeight: 0.95 }}>West Africa</span>
-          <span style={{ display: "block", color: "#1A0A00", fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}>in Denver.</span>
+          <span className="hero-title-line" style={{ display: "block", color: "#743306", fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}>Nana's</span>
+          <span className="hero-title-line" style={{ display: "block", background: "linear-gradient(135deg, #C23D0C 0%, #E85E00 60%, #DB9217 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontSize: "clamp(3rem, 6.5vw, 7.5rem)", lineHeight: 0.95 }}>African Foods</span>
+
         </h1>
 
         <div className="hero-stats" style={{ display: "flex", alignItems: "flex-end", gap: "3rem", marginBottom: "3rem" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-            <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "3.5rem", color: "#C23D0C", lineHeight: 1 }}>100%</span>
-            <span style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>African Ingredients</span>
+            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "3.5rem", color: "#C23D0C", lineHeight: 1 }}>100%</span>
+            <span className="hero-stat-label" style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>African Ingredients</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-            <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "2.5rem", color: "#A44B09", lineHeight: 1 }}>10+</span>
-            <span style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>Signature Dishes</span>
+            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "2.5rem", color: "#A44B09", lineHeight: 1 }}>10+</span>
+            <span className="hero-stat-label" style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>Signature Dishes</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-            <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "2rem", color: "#DB9217", lineHeight: 1, fontStyle: "italic" }}>Fresh</span>
-            <span style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>Made Daily</span>
+            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "2rem", color: "#DB9217", lineHeight: 1, fontStyle: "italic" }}>Fresh</span>
+            <span className="hero-stat-label" style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>Made Daily</span>
           </div>
         </div>
 

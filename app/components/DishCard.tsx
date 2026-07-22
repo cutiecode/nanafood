@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useRouter } from "next/navigation";
+import { Star } from "lucide-react";
 
 type Dish = {
   id: string;
@@ -55,7 +56,7 @@ export default function DishCard({ dish }: Props) {
       <div
         className="dish-card-image"
         style={{
-          width: "100%", height: "200px",
+          width: "100%", height: "160px",
           background: "linear-gradient(135deg, #F5EFE6 0%, #EDE4D6 100%)",
           position: "relative", display: "flex",
           alignItems: "center", justifyContent: "center", overflow: "hidden",
@@ -71,21 +72,15 @@ export default function DishCard({ dish }: Props) {
           <>
             <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #743306 1px, transparent 1px)", backgroundSize: "20px 20px", opacity: 0.04 }} />
             <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center, rgba(194,61,12,0.10) 0%, transparent 70%)" }} />
-            <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "clamp(1rem, 2.5vw, 1.3rem)", color: "rgba(194,61,12,0.35)", textAlign: "center", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
+            <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.15rem", color: "rgba(194,61,12,0.35)", textAlign: "center", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
               {dish.name}
             </span>
           </>
         )}
 
-        {dish.discountPercent && (
-          <div className="dish-card-badge" style={{ position: "absolute", bottom: "12px", left: "12px", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.20)", color: "#FFFFFF", fontSize: "10px", fontWeight: 700, fontFamily: "var(--font-dm)", padding: "0.25rem 0.75rem", borderRadius: "100px", letterSpacing: "0.08em", zIndex: 2 }}>
-            -{dish.discountPercent}% off
-          </div>
-        )}
-
         {dish.popular && (
-          <div className="dish-card-badge" style={{ position: "absolute", top: "12px", left: "12px", background: "rgba(194,61,12,0.85)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.20)", color: "#ECD8B6", fontSize: "10px", fontWeight: 700, fontFamily: "var(--font-dm)", padding: "0.25rem 0.75rem", borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.1em", zIndex: 2 }}>
-            Popular
+          <div className="dish-card-popular-badge" style={{ position: "absolute", top: "12px", left: "12px", zIndex: 2, display: "flex", filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.45))" }}>
+            <Star size={16} color="#FFA309" fill="#FFA309" strokeWidth={0} />
           </div>
         )}
 
@@ -107,11 +102,11 @@ export default function DishCard({ dish }: Props) {
         <div className="dish-card-price-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "0.75rem", borderTop: "1px solid rgba(219,146,23,0.20)" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-              <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#C23D0C" }}>
+              <span className="dish-card-price" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#C23D0C" }}>
                 ${dish.price.toFixed(2)}
               </span>
               {dish.originalPrice && (
-                <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#DB9217", textDecoration: "line-through", fontWeight: 300 }}>
+                <span className="dish-card-price-original" style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#DB9217", textDecoration: "line-through", fontWeight: 300 }}>
                   ${dish.originalPrice.toFixed(2)}
                 </span>
               )}
