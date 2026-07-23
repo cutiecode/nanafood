@@ -126,14 +126,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Menu size={22} strokeWidth={1.75} />
           </button>
           <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 900, fontSize: "1.3rem", color: "#ECD8B6" }}>
-            Nana<span style={{ color: "#FFA309" }}>Food</span>
+            Nana's<span style={{ color: "#FFA309" }}> African Foods</span>
           </span>
           <div style={{ width: "32px" }} />
         </div>
 
         <main className="admin-main" style={{ flex: 1, marginLeft: "240px", minHeight: "100vh", paddingTop: "2.5rem" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 2rem" }}>
-            <div className="admin-topbar" style={{ display: "none", height: "60px", marginBottom: "1rem" }} />
             {children}
           </div>
         </main>

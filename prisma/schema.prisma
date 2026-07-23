@@ -93,6 +93,7 @@ model Order {
   phone       String?
   address     String?
   discount    Float?
+  processed   Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
 

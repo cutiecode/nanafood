@@ -12,3 +12,20 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    const { id, processed } = await req.json();
+    if (!id || typeof processed !== "boolean") {
+      return NextResponse.json({ error: "id and processed are required" }, { status: 400 });
+    }
+    const order = await prisma.order.update({
+      where: { id },
+      data: { processed },
+    });
+    return NextResponse.json(order);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
+  }
+}

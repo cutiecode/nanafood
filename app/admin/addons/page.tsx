@@ -134,12 +134,12 @@ export default function AdminAddons() {
   ) => (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div>
-        <h2 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.3rem", color: "#743306", marginBottom: "0.2rem" }}>{title}</h2>
+        <h2 className="admin-card-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.3rem", color: "#743306", marginBottom: "0.2rem" }}>{title}</h2>
         <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09", fontWeight: 300 }}>{items.length} items · {subtitle}</p>
       </div>
 
       <div style={cardStyle}>
-        <div style={{ padding: "1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <div className="admin-addon-list" style={{ padding: "1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           {items.length === 0 && (
             <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", fontWeight: 300, padding: "1rem 0" }}>
               No items yet — add one below.
@@ -216,7 +216,7 @@ export default function AdminAddons() {
         </div>
 
         {/* Add new */}
-        <div style={{ padding: "1.25rem 1.5rem", borderTop: "1px solid rgba(219,146,23,0.15)", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <div className="admin-addon-list" style={{ padding: "1.25rem 1.5rem", borderTop: "1px solid rgba(219,146,23,0.15)", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
           {newImage && (
             <div style={{ position: "relative", width: "100%", height: "100px", borderRadius: "8px", overflow: "hidden", border: `1px solid ${accentColor}33` }}>
               <img src={newImage} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -278,11 +278,11 @@ export default function AdminAddons() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-      <div>
-        <h1 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.8rem", color: "#743306", marginBottom: "0.35rem" }}>
+      <div className="admin-page-head">
+        <h1 className="admin-page-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.8rem", color: "#743306", marginBottom: "0.35rem" }}>
           Drinks & Desserts
         </h1>
-        <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", fontWeight: 300 }}>
+        <p className="admin-page-subtitle" style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", fontWeight: 300 }}>
           Manage your drinks and desserts — with photos, prices and names.
         </p>
       </div>
