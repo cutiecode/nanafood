@@ -259,16 +259,17 @@ export default function AdminMenu() {
   if (view === "categories") {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="admin-page-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <h1 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.8rem", color: "#743306", marginBottom: "0.35rem" }}>
+            <h1 className="admin-page-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.8rem", color: "#743306", marginBottom: "0.35rem" }}>
               Categories & Menu
             </h1>
-            <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", fontWeight: 300 }}>
+            <p className="admin-page-subtitle" style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", fontWeight: 300 }}>
               {categories.length} categories · Click a category to manage its dishes.
             </p>
           </div>
           <button
+            className="admin-primary-btn"
             onClick={() => { setIsAddingCategory(true); setEditingCategoryId(null); setCategoryForm({ label: "", description: "" }); }}
             style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.25rem", borderRadius: "100px", background: "linear-gradient(135deg, #C23D0C 0%, #743306 100%)", border: "none", color: "#ECD8B6", fontFamily: "var(--font-dm)", fontWeight: 500, fontSize: "0.875rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(194,61,12,0.30)", transition: "all 0.2s", flexShrink: 0 }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-1px)")}
@@ -280,7 +281,7 @@ export default function AdminMenu() {
         </div>
 
         {(isAddingCategory || editingCategoryId) && (
-          <div style={{ ...cardStyle, padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="admin-form-card" style={{ ...cardStyle, padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <h2 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.1rem", color: "#743306" }}>
                 {isAddingCategory ? "New Category" : "Edit Category"}
@@ -319,12 +320,13 @@ export default function AdminMenu() {
             </button>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" }}>
+          <div className="admin-category-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" }}>
             {categories.map((cat) => {
               const count = dishes.filter((d) => d.categoryId === cat.id || d.category?.id === cat.id).length;
               return (
                 <div
                   key={cat.id}
+                  className="admin-category-card"
                   style={{ ...cardStyle, padding: "1.5rem", cursor: "pointer", transition: "all 0.2s", display: "flex", flexDirection: "column", gap: "1rem" }}
                   onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(194,61,12,0.45)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)"; e.currentTarget.style.transform = "translateY(0)"; }}
@@ -381,11 +383,12 @@ export default function AdminMenu() {
             Categories
           </button>
           <span style={{ color: "#DB9217" }}>/</span>
-          <h1 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.5rem", color: "#743306" }}>
+          <h1 className="admin-breadcrumb-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.5rem", color: "#743306" }}>
             {selectedCategory?.label}
           </h1>
         </div>
         <button
+          className="admin-primary-btn"
           onClick={startAddDish}
           style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.25rem", borderRadius: "100px", background: "linear-gradient(135deg, #C23D0C 0%, #743306 100%)", border: "none", color: "#ECD8B6", fontFamily: "var(--font-dm)", fontWeight: 500, fontSize: "0.875rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(194,61,12,0.30)", transition: "all 0.2s", flexShrink: 0 }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-1px)")}
@@ -397,7 +400,7 @@ export default function AdminMenu() {
       </div>
 
       {(isAddingDish || editingDishId) && (
-        <div style={{ ...cardStyle, padding: "1.75rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <div className="admin-form-card" style={{ ...cardStyle, padding: "1.75rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <h2 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#743306" }}>
               {isAddingDish ? "New Dish" : "Edit Dish"}
@@ -559,12 +562,12 @@ export default function AdminMenu() {
           </div>
         ) : (
           <div className="admin-table-wrap" style={{ overflowX: "auto" }}>
-            <div style={{ minWidth: "600px" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <div className="admin-dish-table-inner" style={{ minWidth: "600px" }}>
+              <table className="admin-dish-table" style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ borderBottom: "1px solid rgba(219,146,23,0.20)", background: "rgba(236,216,182,0.25)" }}>
                     {["Dish", "Price", "Discount", "Feeds", "Add-ons", "Popular", "Actions"].map((h) => (
-                      <th key={h} style={{ padding: "0.75rem 1.5rem", textAlign: "left", fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.14em", color: "#A44B09", whiteSpace: "nowrap" }}>{h}</th>
+                      <th key={h} className={["Discount", "Feeds", "Add-ons", "Popular"].includes(h) ? "admin-hide-mobile" : undefined} style={{ padding: "0.75rem 1.5rem", textAlign: "left", fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.14em", color: "#A44B09", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -574,6 +577,11 @@ export default function AdminMenu() {
                       <td style={{ padding: "1rem 1.5rem" }}>
                         <p style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "0.95rem", color: "#743306", marginBottom: "0.2rem" }}>{dish.name}</p>
                         <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.78rem", color: "#A44B09", fontWeight: 300, maxWidth: "200px" }}>{dish.description?.length > 45 ? dish.description.slice(0, 45) + "..." : dish.description}</p>
+                        <div className="admin-show-mobile" style={{ display: "none", flexWrap: "wrap", gap: "0.3rem", marginTop: "0.4rem" }}>
+                          {dish.discountPercent && <span style={{ fontFamily: "var(--font-dm)", fontSize: "9px", fontWeight: 600, color: "#743306", background: "rgba(116,51,6,0.10)", border: "1px solid rgba(116,51,6,0.20)", padding: "0.15rem 0.45rem", borderRadius: "100px" }}>-{dish.discountPercent}%</span>}
+                          {dish.popular && <span style={{ fontFamily: "var(--font-dm)", fontSize: "9px", fontWeight: 600, color: "#C23D0C", background: "rgba(194,61,12,0.10)", border: "1px solid rgba(194,61,12,0.20)", padding: "0.15rem 0.45rem", borderRadius: "100px" }}>Popular</span>}
+                          {dish.supplements?.length > 0 && <span style={{ fontFamily: "var(--font-dm)", fontSize: "9px", color: "#E85E00", background: "rgba(232,94,0,0.10)", border: "1px solid rgba(232,94,0,0.20)", padding: "0.15rem 0.45rem", borderRadius: "100px" }}>{dish.supplements.length} add-on{dish.supplements.length !== 1 ? "s" : ""}</span>}
+                        </div>
                       </td>
                       <td style={{ padding: "1rem 1.5rem" }}>
                         <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
@@ -581,16 +589,16 @@ export default function AdminMenu() {
                           {dish.originalPrice && <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.75rem", color: "#DB9217", textDecoration: "line-through" }}>${Number(dish.originalPrice).toFixed(2)}</span>}
                         </div>
                       </td>
-                      <td style={{ padding: "1rem 1.5rem" }}>
+                      <td className="admin-hide-mobile" style={{ padding: "1rem 1.5rem" }}>
                         {dish.discountPercent ? (
                           <span style={{ fontFamily: "var(--font-dm)", fontSize: "11px", fontWeight: 600, color: "#743306", background: "rgba(116,51,6,0.10)", border: "1px solid rgba(116,51,6,0.20)", padding: "0.2rem 0.6rem", borderRadius: "100px" }}>-{dish.discountPercent}%</span>
                         ) : <span style={{ color: "#DB9217", fontFamily: "var(--font-dm)", fontSize: "0.875rem" }}>—</span>}
                       </td>
-                      <td style={{ padding: "1rem 1.5rem", fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", whiteSpace: "nowrap" }}>{dish.feeds} {dish.feeds === 1 ? "person" : "people"}</td>
-                      <td style={{ padding: "1rem 1.5rem" }}>
+                      <td className="admin-hide-mobile" style={{ padding: "1rem 1.5rem", fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", whiteSpace: "nowrap" }}>{dish.feeds} {dish.feeds === 1 ? "person" : "people"}</td>
+                      <td className="admin-hide-mobile" style={{ padding: "1rem 1.5rem" }}>
                         {dish.supplements?.length > 0 ? <span style={{ color: "#E85E00", fontFamily: "var(--font-dm)", fontSize: "0.875rem" }}>{dish.supplements.length} add-on{dish.supplements.length !== 1 ? "s" : ""}</span> : <span style={{ color: "#DB9217", fontFamily: "var(--font-dm)", fontSize: "0.875rem" }}>—</span>}
                       </td>
-                      <td style={{ padding: "1rem 1.5rem" }}>
+                      <td className="admin-hide-mobile" style={{ padding: "1rem 1.5rem" }}>
                         {dish.popular ? <span style={{ color: "#C23D0C", fontFamily: "var(--font-dm)", fontSize: "0.8rem", fontWeight: 500 }}>Yes</span> : <span style={{ color: "#DB9217", fontFamily: "var(--font-dm)", fontSize: "0.8rem" }}>—</span>}
                       </td>
                       <td style={{ padding: "1rem 1.5rem" }}>

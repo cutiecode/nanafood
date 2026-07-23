@@ -136,12 +136,9 @@ export default function AdminProfile() {
     gap: "1.25rem", boxShadow: "0 4px 20px rgba(116,51,6,0.08)",
   };
 
-  const logoName = settings.restaurantName.includes("-")
-    ? settings.restaurantName.split("-")[0] + "-"
-    : settings.restaurantName;
-  const logoSuffix = settings.restaurantName.includes("-")
-    ? settings.restaurantName.split("-").slice(1).join("-")
-    : "";
+  const logoHighlightIdx = settings.restaurantName.toLowerCase().indexOf("african foods");
+  const logoName = logoHighlightIdx >= 0 ? settings.restaurantName.slice(0, logoHighlightIdx) : settings.restaurantName;
+  const logoSuffix = logoHighlightIdx >= 0 ? settings.restaurantName.slice(logoHighlightIdx) : "";
 
   if (isLoadingSettings) {
     return (
@@ -156,17 +153,17 @@ export default function AdminProfile() {
     <div style={{ display: "flex", flexDirection: "column", gap: "2rem", maxWidth: "700px", margin: "0 auto" }}>
 
       {/* Header */}
-      <div>
-        <h1 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.8rem", color: "#743306", marginBottom: "0.35rem" }}>
+      <div className="admin-page-head">
+        <h1 className="admin-page-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.8rem", color: "#743306", marginBottom: "0.35rem" }}>
           Profile & Settings
         </h1>
-        <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", fontWeight: 300 }}>
+        <p className="admin-page-subtitle" style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09", fontWeight: 300 }}>
           Manage your restaurant info and admin credentials.
         </p>
       </div>
 
       {/* Logo preview */}
-      <div style={{ ...cardStyle, padding: "1.25rem 1.75rem", flexDirection: "row", alignItems: "center", gap: "1rem" }}>
+      <div className="admin-form-card admin-logo-preview" style={{ ...cardStyle, padding: "1.25rem 1.75rem", flexDirection: "row", alignItems: "center", gap: "1rem" }}>
         <p style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.14em", color: "#A44B09", flexShrink: 0 }}>
           Logo Preview
         </p>
@@ -174,15 +171,15 @@ export default function AdminProfile() {
           <span style={{ color: "#ECD8B6" }}>{logoName}</span>
           <span style={{ color: "#FFA309" }}>{logoSuffix}</span>
         </div>
-        <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.78rem", color: "#DB9217", fontWeight: 300, marginLeft: "auto" }}>
+        <p className="admin-logo-preview-note" style={{ fontFamily: "var(--font-dm)", fontSize: "0.78rem", color: "#DB9217", fontWeight: 300, marginLeft: "auto" }}>
           Updates live across the admin panel
         </p>
       </div>
 
       {/* Restaurant info */}
-      <div style={cardStyle}>
+      <div className="admin-form-card" style={cardStyle}>
         <div>
-          <h2 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#743306", marginBottom: "0.25rem" }}>
+          <h2 className="admin-card-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#743306", marginBottom: "0.25rem" }}>
             Restaurant Information
           </h2>
           <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09", fontWeight: 300 }}>
@@ -191,7 +188,7 @@ export default function AdminProfile() {
         </div>
 
         <form onSubmit={handleRestaurantSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div className="admin-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={labelStyle}>Restaurant Name</label>
               <input
@@ -294,9 +291,9 @@ export default function AdminProfile() {
       </div>
 
       {/* Change password */}
-      <div style={cardStyle}>
+      <div className="admin-form-card" style={cardStyle}>
         <div>
-          <h2 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#743306", marginBottom: "0.25rem" }}>
+          <h2 className="admin-card-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#743306", marginBottom: "0.25rem" }}>
             Change Password
           </h2>
           <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09", fontWeight: 300 }}>
@@ -354,16 +351,16 @@ export default function AdminProfile() {
       </div>
 
       {/* Danger zone */}
-      <div style={{ ...cardStyle, border: "1px solid rgba(194,61,12,0.25)" }}>
+      <div className="admin-form-card" style={{ ...cardStyle, border: "1px solid rgba(194,61,12,0.25)" }}>
         <div>
-          <h2 style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#C23D0C", marginBottom: "0.25rem" }}>
+          <h2 className="admin-card-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#C23D0C", marginBottom: "0.25rem" }}>
             Danger Zone
           </h2>
           <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09", fontWeight: 300 }}>
             These actions are irreversible. Proceed with caution.
           </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1rem", borderRadius: "10px", background: "rgba(194,61,12,0.05)", border: "1px solid rgba(194,61,12,0.15)" }}>
+        <div className="admin-danger-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1rem", borderRadius: "10px", background: "rgba(194,61,12,0.05)", border: "1px solid rgba(194,61,12,0.15)" }}>
           <div>
             <p style={{ fontFamily: "var(--font-dm)", fontWeight: 500, fontSize: "0.875rem", color: "#743306", marginBottom: "0.2rem" }}>
               Clear all orders
