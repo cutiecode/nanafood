@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, UtensilsCrossed, ShoppingBag, LogOut, Tag, GlassWater, UserCircle, Menu, X } from "lucide-react";
+import { LayoutDashboard, UtensilsCrossed, ShoppingBag, LogOut, Tag, GlassWater, UserCircle, Menu, X, TrendingUp } from "lucide-react";
 import { useSettings } from "@/app/context/SettingsContext";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -22,6 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: "Categories & Menu", href: "/admin/menu", icon: UtensilsCrossed },
     { label: "Drinks & Desserts", href: "/admin/addons", icon: GlassWater },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+    { label: "Insights", href: "/admin/insights", icon: TrendingUp },
     { label: "Profile", href: "/admin/profile", icon: UserCircle },
   ];
 
