@@ -650,6 +650,10 @@ input[type="number"] {
     grid-template-columns: 1fr !important;
   }
 
+  .admin-charts-grid {
+    display: none !important;
+  }
+
   .admin-table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -712,6 +716,10 @@ input[type="number"] {
 
   .admin-page-title {
     font-size: 1.4rem !important;
+  }
+
+  .admin-today-date {
+    font-size: 1.5rem !important;
   }
 
   .admin-page-subtitle {

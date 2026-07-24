@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShoppingBag, DollarSign, TrendingUp, CalendarDays } from "lucide-react";
+import { ShoppingBag, Sparkles, TrendingUp, Clock } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 type Order = {
   id: string;
@@ -10,13 +11,19 @@ type Order = {
   items: string;
   createdAt: string;
   discount?: number;
+  processed: boolean;
 };
 
-type Period = "today" | "week" | "month" | "year";
+function getOrderStatus(order: Order): "new" | "pending" | "processed" {
+  if (order.processed) return "processed";
+  const ageMs = Date.now() - new Date(order.createdAt).getTime();
+  return ageMs < 24 * 60 * 60 * 1000 ? "new" : "pending";
+}
+
+type Period = "today" | "month" | "year";
 
 const periodLabels: Record<Period, string> = {
   today: "Today",
-  week: "This Week",
   month: "This Month",
   year: "This Year",
 };
@@ -26,15 +33,14 @@ function filterByPeriod(orders: Order[], period: Period): Order[] {
   return orders.filter((o) => {
     const date = new Date(o.createdAt);
     if (period === "today") return date.toDateString() === now.toDateString();
-    if (period === "week") {
-      const weekAgo = new Date(now);
-      weekAgo.setDate(now.getDate() - 7);
-      return date >= weekAgo;
-    }
     if (period === "month") return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
     if (period === "year") return date.getFullYear() === now.getFullYear();
     return true;
   });
+}
+
+function formatFullDate(date: Date) {
+  return date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
 }
 
 function formatCompactCurrency(amount: number) {
@@ -49,10 +55,104 @@ function formatDate(dateStr: string) {
   });
 }
 
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+type ActivityMetric = "orders" | "revenue";
+type ActivityPoint = { label: string; orders: number; revenue: number };
+
+function buildActivityData(orders: Order[], period: Period): ActivityPoint[] {
+  const now = new Date();
+
+  if (period === "today") {
+    const buckets: ActivityPoint[] = Array.from({ length: 24 }, (_, h) => ({ label: `${h}h`, orders: 0, revenue: 0 }));
+    orders.forEach((o) => {
+      const h = new Date(o.createdAt).getHours();
+      buckets[h].orders += 1;
+      buckets[h].revenue += Number(o.amount);
+    });
+    return buckets;
+  }
+
+  if (period === "month") {
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const buckets: ActivityPoint[] = Array.from({ length: daysInMonth }, (_, i) => ({ label: String(i + 1), orders: 0, revenue: 0 }));
+    orders.forEach((o) => {
+      const day = new Date(o.createdAt).getDate();
+      buckets[day - 1].orders += 1;
+      buckets[day - 1].revenue += Number(o.amount);
+    });
+    return buckets;
+  }
+
+  const buckets: ActivityPoint[] = monthNames.map((label) => ({ label, orders: 0, revenue: 0 }));
+  orders.forEach((o) => {
+    const m = new Date(o.createdAt).getMonth();
+    buckets[m].orders += 1;
+    buckets[m].revenue += Number(o.amount);
+  });
+  return buckets;
+}
+
+type ComparisonRange = "14d" | "3m" | "6m";
+type ComparisonPoint = { label: string; current: number; previous: number };
+
+const comparisonRangeLabels: Record<ComparisonRange, string> = {
+  "14d": "14 days",
+  "3m": "3 months",
+  "6m": "6 months",
+};
+
+function buildComparisonData(orders: Order[], range: ComparisonRange): ComparisonPoint[] {
+  const now = new Date();
+  const dayMs = 24 * 60 * 60 * 1000;
+
+  if (range === "14d") {
+    const labels = Array.from({ length: 14 }, (_, i) => (i === 13 ? "Today" : `D-${13 - i}`));
+    const current = Array(14).fill(0);
+    const previous = Array(14).fill(0);
+    orders.forEach((o) => {
+      const daysAgo = Math.floor((now.getTime() - new Date(o.createdAt).getTime()) / dayMs);
+      if (daysAgo >= 0 && daysAgo < 14) current[13 - daysAgo] += Number(o.amount);
+      else if (daysAgo >= 14 && daysAgo < 28) previous[13 - (daysAgo - 14)] += Number(o.amount);
+    });
+    return labels.map((label, i) => ({ label, current: current[i], previous: previous[i] }));
+  }
+
+  if (range === "3m") {
+    const labels = Array.from({ length: 12 }, (_, i) => `W${i + 1}`);
+    const current = Array(12).fill(0);
+    const previous = Array(12).fill(0);
+    orders.forEach((o) => {
+      const daysAgo = Math.floor((now.getTime() - new Date(o.createdAt).getTime()) / dayMs);
+      const weeksAgo = Math.floor(daysAgo / 7);
+      if (weeksAgo >= 0 && weeksAgo < 12) current[11 - weeksAgo] += Number(o.amount);
+      else if (weeksAgo >= 12 && weeksAgo < 24) previous[11 - (weeksAgo - 12)] += Number(o.amount);
+    });
+    return labels.map((label, i) => ({ label, current: current[i], previous: previous[i] }));
+  }
+
+  const labels: string[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    labels.push(monthNames[d.getMonth()]);
+  }
+  const current = Array(6).fill(0);
+  const previous = Array(6).fill(0);
+  orders.forEach((o) => {
+    const d = new Date(o.createdAt);
+    const monthsAgo = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+    if (monthsAgo >= 0 && monthsAgo < 6) current[5 - monthsAgo] += Number(o.amount);
+    else if (monthsAgo >= 6 && monthsAgo < 12) previous[5 - (monthsAgo - 6)] += Number(o.amount);
+  });
+  return labels.map((label, i) => ({ label, current: current[i], previous: previous[i] }));
+}
+
 export default function AdminDashboard() {
   const [period, setPeriod] = useState<Period>("month");
   const [allOrders, setAllOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activityMetric, setActivityMetric] = useState<ActivityMetric>("orders");
+  const [comparisonRange, setComparisonRange] = useState<ComparisonRange>("14d");
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -72,14 +172,22 @@ export default function AdminDashboard() {
   const filtered = filterByPeriod(allOrders, period);
   const totalRevenue = filtered.reduce((sum, o) => sum + Number(o.amount), 0);
   const totalDiscount = filtered.reduce((sum, o) => sum + Number(o.discount || 0), 0);
-  const todayOrders = filterByPeriod(allOrders, "today");
-  const todayRevenue = todayOrders.reduce((sum, o) => sum + Number(o.amount), 0);
+  const newCount = filtered.filter((o) => getOrderStatus(o) === "new").length;
+  const pendingCount = filtered.filter((o) => getOrderStatus(o) === "pending").length;
+
+  const activityData = buildActivityData(filtered, period);
+  const comparisonData = buildComparisonData(allOrders, comparisonRange);
+  const comparisonCurrentTotal = comparisonData.reduce((sum, p) => sum + p.current, 0);
+  const comparisonPreviousTotal = comparisonData.reduce((sum, p) => sum + p.previous, 0);
+  const comparisonChangePct = comparisonPreviousTotal > 0
+    ? ((comparisonCurrentTotal - comparisonPreviousTotal) / comparisonPreviousTotal) * 100
+    : (comparisonCurrentTotal > 0 ? 100 : 0);
 
   const stats = [
-    { label: "Revenue", value: formatCompactCurrency(totalRevenue), icon: DollarSign, color: "#C23D0C", bg: "rgba(194,61,12,0.12)", sub: periodLabels[period] },
+    { label: "New Orders", value: newCount, icon: Sparkles, color: "#C23D0C", bg: "rgba(194,61,12,0.12)", sub: periodLabels[period] },
     { label: "Orders", value: filtered.length, icon: ShoppingBag, color: "#E85E00", bg: "rgba(232,94,0,0.12)", sub: periodLabels[period] },
-    { label: "Today's Revenue", value: formatCompactCurrency(todayRevenue), icon: TrendingUp, color: "#DB9217", bg: "rgba(219,146,23,0.12)", sub: "Live" },
-    { label: "Today's Orders", value: todayOrders.length, icon: CalendarDays, color: "#A44B09", bg: "rgba(164,75,9,0.12)", sub: "Live" },
+    { label: "Revenue", value: formatCompactCurrency(totalRevenue), icon: TrendingUp, color: "#DB9217", bg: "rgba(219,146,23,0.12)", sub: periodLabels[period] },
+    { label: "Pending Orders", value: pendingCount, icon: Clock, color: "#A44B09", bg: "rgba(164,75,9,0.12)", sub: periodLabels[period] },
   ];
 
   if (isLoading) {
@@ -96,6 +204,9 @@ export default function AdminDashboard() {
 
       <div className="admin-page-head" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
         <div>
+          <p className="admin-today-date" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "2.4rem", color: "#C23D0C", lineHeight: 1.1, marginBottom: "0.5rem" }}>
+            {formatFullDate(new Date())}
+          </p>
           <h1 className="admin-page-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.8rem", color: "#743306", marginBottom: "0.35rem" }}>
             Dashboard
           </h1>
@@ -154,6 +265,102 @@ export default function AdminDashboard() {
             </p>
           </div>
         ))}
+      </div>
+
+      {/* Charts */}
+      <div className="admin-charts-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "1.5rem" }}>
+
+        {/* Chart 1 — Order Activity */}
+        <div style={{ background: "rgba(255,255,255,0.75)", backdropFilter: "blur(16px)", border: "1px solid rgba(219,146,23,0.30)", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 4px 20px rgba(116,51,6,0.08)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", marginBottom: "1rem" }}>
+            <h2 className="admin-card-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.1rem", color: "#743306" }}>
+              Order Activity
+            </h2>
+            <div style={{ display: "flex", gap: "0.35rem" }}>
+              {(["orders", "revenue"] as ActivityMetric[]).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setActivityMetric(m)}
+                  style={{
+                    padding: "0.35rem 0.85rem", borderRadius: "100px", fontSize: "10px",
+                    fontFamily: "var(--font-dm)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer",
+                    background: activityMetric === m ? "#743306" : "rgba(255,255,255,0.6)",
+                    border: activityMetric === m ? "1px solid #743306" : "1px solid rgba(164,75,9,0.25)",
+                    color: activityMetric === m ? "#ECD8B6" : "#A44B09",
+                  }}
+                >
+                  {m === "orders" ? "Orders" : "Revenue"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={activityData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(164,75,9,0.15)" />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fontFamily: "var(--font-dm)", fill: "#A44B09" }} axisLine={{ stroke: "rgba(164,75,9,0.25)" }} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fontFamily: "var(--font-dm)", fill: "#A44B09" }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip
+                formatter={(value) => activityMetric === "revenue" ? [`$${Number(value).toFixed(2)}`, "Revenue"] : [Number(value), "Orders"]}
+                contentStyle={{ background: "#FFFFFF", border: "1px solid rgba(219,146,23,0.30)", borderRadius: "8px", fontFamily: "var(--font-dm)", fontSize: "0.8rem" }}
+              />
+              <Line type="monotone" dataKey={activityMetric} stroke="#C23D0C" strokeWidth={2.5} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Chart 2 — Period Comparison */}
+        <div style={{ background: "rgba(255,255,255,0.75)", backdropFilter: "blur(16px)", border: "1px solid rgba(219,146,23,0.30)", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 4px 20px rgba(116,51,6,0.08)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.75rem" }}>
+            <h2 className="admin-card-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.1rem", color: "#743306" }}>
+              Period Comparison
+            </h2>
+            <div style={{ display: "flex", gap: "0.35rem" }}>
+              {(Object.keys(comparisonRangeLabels) as ComparisonRange[]).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setComparisonRange(r)}
+                  style={{
+                    padding: "0.35rem 0.85rem", borderRadius: "100px", fontSize: "10px",
+                    fontFamily: "var(--font-dm)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer",
+                    background: comparisonRange === r ? "#743306" : "rgba(255,255,255,0.6)",
+                    border: comparisonRange === r ? "1px solid #743306" : "1px solid rgba(164,75,9,0.25)",
+                    color: comparisonRange === r ? "#ECD8B6" : "#A44B09",
+                  }}
+                >
+                  {comparisonRangeLabels[r]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: "0.75rem" }}>
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: "0.35rem",
+              fontFamily: "var(--font-dm)", fontSize: "0.8rem", fontWeight: 600,
+              color: comparisonChangePct >= 0 ? "#166534" : "#C23D0C",
+            }}>
+              {comparisonChangePct >= 0 ? "↑" : "↓"} {comparisonChangePct >= 0 ? "+" : ""}{comparisonChangePct.toFixed(1)}% vs previous period
+            </span>
+          </div>
+
+          <ResponsiveContainer width="100%" height={220}>
+            <LineChart data={comparisonData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(164,75,9,0.15)" />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fontFamily: "var(--font-dm)", fill: "#A44B09" }} axisLine={{ stroke: "rgba(164,75,9,0.25)" }} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fontFamily: "var(--font-dm)", fill: "#A44B09" }} axisLine={false} tickLine={false} />
+              <Tooltip
+                formatter={(value) => [`$${Number(value).toFixed(2)}`, ""]}
+                contentStyle={{ background: "#FFFFFF", border: "1px solid rgba(219,146,23,0.30)", borderRadius: "8px", fontFamily: "var(--font-dm)", fontSize: "0.8rem" }}
+              />
+              <Legend
+                wrapperStyle={{ fontFamily: "var(--font-dm)", fontSize: "0.75rem" }}
+                formatter={(value) => (value === "current" ? "Current" : "Previous")}
+              />
+              <Line type="monotone" dataKey="current" name="current" stroke="#C23D0C" strokeWidth={2.5} dot={false} />
+              <Line type="monotone" dataKey="previous" name="previous" stroke="#9A9585" strokeWidth={2} strokeDasharray="5 4" dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Recent orders */}
