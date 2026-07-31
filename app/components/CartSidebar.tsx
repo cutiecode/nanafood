@@ -6,7 +6,7 @@ import { useCart } from "@/app/context/CartContext";
 import { useSettings } from "@/app/context/SettingsContext";
 
 export default function CartSidebar() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
+  const { items, isOpen, closeCart, removeItem, updateQuantity, totalPrice, totalItems, clearCart, note, setNote } = useCart();
   const settings = useSettings();
   const taxRate = settings.taxRate / 100;
   const taxMultiplier = 1 + taxRate;
@@ -18,7 +18,7 @@ export default function CartSidebar() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, note }),
       });
       const data = await res.json();
       if (data.url) {
@@ -140,6 +140,35 @@ export default function CartSidebar() {
                 </div>
               </div>
             ))}
+
+            <div className="cart-sidebar-note" style={{ background: "rgba(255,255,255,0.80)", backdropFilter: "blur(12px)", border: "1px solid rgba(219,146,23,0.25)", borderRadius: "14px", padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.5rem", boxShadow: "0 2px 8px rgba(116,51,6,0.06)" }}>
+              <label style={{ display: "flex", alignItems: "baseline", gap: "0.4rem" }}>
+                <span style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.14em", color: "#DB9217" }}>
+                  Special Instructions
+                </span>
+                <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.7rem", color: "#A44B09", fontWeight: 300 }}>
+                  (optional)
+                </span>
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Special instructions... (allergies, delivery notes, no spice, etc.)"
+                rows={3}
+                style={{
+                  background: "rgba(255,255,255,0.80)",
+                  border: "1px solid rgba(219,146,23,0.25)",
+                  borderRadius: "10px",
+                  color: "#743306",
+                  fontFamily: "var(--font-dm)",
+                  fontSize: "0.82rem",
+                  padding: "0.75rem 1rem",
+                  resize: "none",
+                  width: "100%",
+                  outline: "none",
+                }}
+              />
+            </div>
           </div>
         )}
 

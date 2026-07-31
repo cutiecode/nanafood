@@ -50,10 +50,19 @@ export default function Navbar() {
             href="/"
             onClick={closeMenu}
             className="public-navbar-logo"
-            style={{ fontFamily: "var(--font-playfair)", fontWeight: 900, fontSize: "1.1rem", textDecoration: "none", whiteSpace: "nowrap", display: "inline-block" }}
+            style={{ display: "flex", alignItems: "center", gap: "0.6rem", textDecoration: "none", whiteSpace: "nowrap" }}
           >
-            <span style={{ color: "#ECD8B6" }}>{before}</span>
-            <span style={{ color: "#FFA309" }}>{after}</span>
+            {settings.logo && (
+              <img
+                src={settings.logo}
+                alt=""
+                style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+              />
+            )}
+            <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 900, fontSize: "1.1rem", display: "inline-block" }}>
+              <span style={{ color: "#ECD8B6" }}>{before}</span>
+              <span style={{ color: "#FFA309" }}>{after}</span>
+            </span>
           </a>
 
           <nav style={{ display: "flex", alignItems: "center", gap: "2.5rem" }} className="hidden-mobile">

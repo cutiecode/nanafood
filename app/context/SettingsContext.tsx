@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 type Settings = {
   restaurantName: string;
+  logo: string;
   email: string;
   phone: string;
   address: string;
@@ -17,6 +18,7 @@ type Settings = {
 
 const defaultSettings: Settings = {
   restaurantName: "Nana-AfricanFood",
+  logo: "",
   email: "hello@nanafood.com",
   phone: "+1 (720) 000-0000",
   address: "Denver, CO 80202",

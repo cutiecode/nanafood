@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Eye, EyeOff, Instagram, Facebook } from "lucide-react";
+import { Check, Eye, EyeOff, Instagram, Facebook, X } from "lucide-react";
 
 type Settings = {
   restaurantName: string;
+  logo: string;
   email: string;
   phone: string;
   address: string;
@@ -19,6 +20,7 @@ type Settings = {
 export default function AdminProfile() {
   const [settings, setSettings] = useState<Settings>({
     restaurantName: "Nana-AfricanFood",
+    logo: "",
     email: "hello@nanafood.com",
     phone: "+1 (720) 000-0000",
     address: "Denver, CO 80202",
@@ -30,6 +32,7 @@ export default function AdminProfile() {
     tiktok: "",
   });
   const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [restaurantSuccess, setRestaurantSuccess] = useState(false);
   const [restaurantError, setRestaurantError] = useState("");
   const [isSavingSettings, setIsSavingSettings] = useState(false);
@@ -56,6 +59,23 @@ export default function AdminProfile() {
     };
     fetchSettings();
   }, []);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url) setSettings((p) => ({ ...p, logo: data.url }));
+    } catch (error) {
+      console.error("Logo upload failed:", error);
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
 
   const handleRestaurantSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,16 +183,38 @@ export default function AdminProfile() {
       </div>
 
       {/* Logo preview */}
-      <div className="admin-form-card admin-logo-preview" style={{ ...cardStyle, padding: "1.25rem 1.75rem", flexDirection: "row", alignItems: "center", gap: "1rem" }}>
+      <div className="admin-form-card admin-logo-preview" style={{ ...cardStyle, padding: "1.25rem 1.75rem", flexDirection: "row", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
         <p style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.14em", color: "#A44B09", flexShrink: 0 }}>
-          Logo Preview
+          Logo
         </p>
-        <div style={{ fontFamily: "var(--font-playfair)", fontWeight: 900, fontSize: "1.5rem", letterSpacing: "-0.01em" }}>
+
+        {settings.logo ? (
+          <div style={{ position: "relative", width: "48px", height: "48px", flexShrink: 0 }}>
+            <img src={settings.logo} alt="Logo" style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover", border: "1px solid rgba(219,146,23,0.30)", display: "block" }} />
+            <button
+              type="button"
+              onClick={() => setSettings((p) => ({ ...p, logo: "" }))}
+              style={{ position: "absolute", top: "-6px", right: "-6px", width: "20px", height: "20px", borderRadius: "50%", background: "rgba(116,51,6,0.85)", border: "none", color: "#ECD8B6", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              <X size={11} strokeWidth={2} />
+            </button>
+          </div>
+        ) : (
+          <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(219,146,23,0.10)", border: "1px dashed rgba(219,146,23,0.35)", flexShrink: 0 }} />
+        )}
+
+        <label style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "0.6rem 1.1rem", borderRadius: "100px", cursor: uploadingLogo ? "not-allowed" : "pointer", background: "rgba(255,255,255,0.5)", border: "1px dashed rgba(194,61,12,0.35)", color: "#A44B09", fontFamily: "var(--font-dm)", fontSize: "0.8rem", transition: "all 0.2s", flexShrink: 0 }}>
+          <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: "none" }} disabled={uploadingLogo} />
+          {uploadingLogo ? "Uploading..." : settings.logo ? "Change logo" : "Upload logo"}
+        </label>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontFamily: "var(--font-playfair)", fontWeight: 900, fontSize: "1.3rem", letterSpacing: "-0.01em" }}>
           <span style={{ color: "#ECD8B6" }}>{logoName}</span>
           <span style={{ color: "#FFA309" }}>{logoSuffix}</span>
         </div>
+
         <p className="admin-logo-preview-note" style={{ fontFamily: "var(--font-dm)", fontSize: "0.78rem", color: "#DB9217", fontWeight: 300, marginLeft: "auto" }}>
-          Updates live across the admin panel
+          Updates live across the site — save to apply
         </p>
       </div>
 

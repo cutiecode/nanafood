@@ -22,6 +22,8 @@ type CartContextType = {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  note: string;
+  setNote: (note: string) => void;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -29,6 +31,7 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [note, setNote] = useState("");
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
@@ -77,7 +80,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const clearCart = () => setItems([]);
+  const clearCart = () => {
+    setItems([]);
+    setNote("");
+  };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce(
@@ -98,6 +104,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         totalItems,
         totalPrice,
+        note,
+        setNote,
       }}
     >
       {children}
