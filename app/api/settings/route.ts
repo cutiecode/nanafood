@@ -26,6 +26,7 @@ export async function PUT(req: Request) {
       where: { id: "default" },
       update: {
         restaurantName: body.restaurantName,
+        logo: body.logo || "",
         email: body.email,
         phone: body.phone,
         address: body.address,
@@ -39,6 +40,7 @@ export async function PUT(req: Request) {
       create: {
         id: "default",
         restaurantName: body.restaurantName,
+        logo: body.logo || "",
         email: body.email,
         phone: body.phone,
         address: body.address,

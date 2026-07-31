@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: NextRequest) {
   try {
-    const { items } = await req.json();
+    const { items, note } = await req.json();
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/?canceled=true`,
       metadata: {
         source: "nanafood_web",
+        note: note || "",
       },
       automatic_tax: { enabled: false },
       custom_fields: [

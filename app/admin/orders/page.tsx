@@ -11,6 +11,7 @@ type Order = {
   phone?: string;
   address?: string;
   discount?: number;
+  note?: string;
   createdAt: string;
   processed: boolean;
 };
@@ -265,6 +266,13 @@ export default function AdminOrders() {
                 {/* Expanded details */}
                 {expandedId === order.id && (
                   <div className="admin-order-detail" style={{ padding: "1.25rem 1.5rem 1.5rem", borderTop: "1px solid rgba(219,146,23,0.15)", background: "rgba(236,216,182,0.15)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
+                    {order.note && order.note.trim() !== "" && (
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <p style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.14em", color: "#DB9217", marginBottom: "0.4rem" }}>📝 Special Instructions</p>
+                        <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#743306", fontWeight: 300, lineHeight: 1.7 }}>{order.note}</p>
+                      </div>
+                    )}
+
                     <div>
                       <p style={{ fontFamily: "var(--font-dm)", fontSize: "10px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.14em", color: "#DB9217", marginBottom: "0.4rem" }}>Order ID</p>
                       <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#743306", fontWeight: 400, wordBreak: "break-all" }}>{order.orderNumber || order.id}</p>

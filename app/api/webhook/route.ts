@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
         ? session.total_details.amount_discount / 100
         : null;
 
+      const note = session.metadata?.note || "";
+
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const ordersToday = await prisma.order.count({ where: { createdAt: { gte: startOfDay } } });
@@ -53,6 +55,7 @@ export async function POST(req: NextRequest) {
             ? `${session.customer_details.address.line1}, ${session.customer_details.address.city} ${session.customer_details.address.postal_code}`
             : null,
           discount,
+          note,
         },
       });
 

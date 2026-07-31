@@ -93,6 +93,7 @@ model Order {
   phone       String?
   address     String?
   discount    Float?
+  note        String?  @default("")
   processed   Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
@@ -100,6 +101,7 @@ model Order {
 model Settings {
   id             String  @id @default("default")
   restaurantName String  @default("Nana-AfricanFood")
+  logo           String  @default("")
   email          String  @default("hello@nanafood.com")
   phone          String  @default("+1 (720) 000-0000")
   address        String  @default("Denver, CO 80202")
