@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { ShoppingBag, Sparkles, TrendingUp, Clock } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import dynamic from "next/dynamic";
+
+const ChartsClient = dynamic(() => import("./ChartsClient"), { ssr: false });
 
 type Order = {
   id: string;
@@ -294,18 +296,7 @@ export default function AdminDashboard() {
               ))}
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={activityData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(164,75,9,0.15)" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fontFamily: "var(--font-dm)", fill: "#A44B09" }} axisLine={{ stroke: "rgba(164,75,9,0.25)" }} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fontFamily: "var(--font-dm)", fill: "#A44B09" }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip
-                formatter={(value) => activityMetric === "revenue" ? [`$${Number(value).toFixed(2)}`, "Revenue"] : [Number(value), "Orders"]}
-                contentStyle={{ background: "#FFFFFF", border: "1px solid rgba(219,146,23,0.30)", borderRadius: "8px", fontFamily: "var(--font-dm)", fontSize: "0.8rem" }}
-              />
-              <Line type="monotone" dataKey={activityMetric} stroke="#C23D0C" strokeWidth={2.5} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <ChartsClient activityData={activityData} activityMetric={activityMetric} comparisonData={comparisonData} render="activity" />
         </div>
 
         {/* Chart 2 — Period Comparison */}
@@ -343,23 +334,8 @@ export default function AdminDashboard() {
             </span>
           </div>
 
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={comparisonData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(164,75,9,0.15)" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fontFamily: "var(--font-dm)", fill: "#A44B09" }} axisLine={{ stroke: "rgba(164,75,9,0.25)" }} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fontFamily: "var(--font-dm)", fill: "#A44B09" }} axisLine={false} tickLine={false} />
-              <Tooltip
-                formatter={(value) => [`$${Number(value).toFixed(2)}`, ""]}
-                contentStyle={{ background: "#FFFFFF", border: "1px solid rgba(219,146,23,0.30)", borderRadius: "8px", fontFamily: "var(--font-dm)", fontSize: "0.8rem" }}
-              />
-              <Legend
-                wrapperStyle={{ fontFamily: "var(--font-dm)", fontSize: "0.75rem" }}
-                formatter={(value) => (value === "current" ? "Current" : "Previous")}
-              />
-              <Line type="monotone" dataKey="current" name="current" stroke="#C23D0C" strokeWidth={2.5} dot={false} />
-              <Line type="monotone" dataKey="previous" name="previous" stroke="#9A9585" strokeWidth={2} strokeDasharray="5 4" dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          {/* Charts are rendered client-side to avoid SSR/import-time issues with Recharts */}
+          <ChartsClient activityData={activityData} activityMetric={activityMetric} comparisonData={comparisonData} render="comparison" />
         </div>
       </div>
 

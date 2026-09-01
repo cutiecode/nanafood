@@ -31,15 +31,15 @@ export default function Hero() {
 
         <div className="hero-stats" style={{ display: "flex", alignItems: "flex-end", gap: "3rem", marginBottom: "3rem" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "clamp(3.5rem, 3vw, 4.5rem)", color: "#C23D0C", lineHeight: 1 }}>100%</span>
+            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "clamp(2.5rem, 3vw, 4.5rem)", color: "#C23D0C", lineHeight: 1 }}>100%</span>
             <span className="hero-stat-label" style={{ fontFamily: "var(--font-dm)", fontSize: "clamp(10px, 0.6vw, 13px)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>African Ingredients</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "clamp(2.5rem, 2.2vw, 3.2rem)", color: "#A44B09", lineHeight: 1 }}>10+</span>
+            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "clamp(2.5rem, 3vw, 4.5rem)", color: "#A44B09", lineHeight: 1 }}>10+</span>
             <span className="hero-stat-label" style={{ fontFamily: "var(--font-dm)", fontSize: "clamp(10px, 0.6vw, 13px)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>Signature Dishes</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "clamp(2rem, 1.8vw, 2.6rem)", color: "#DB9217", lineHeight: 1, fontStyle: "italic" }}>Fresh</span>
+            <span className="hero-stat-value" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "clamp(2.5rem, 3vw, 4.5rem)", color: "#DB9217", lineHeight: 1, fontStyle: "italic" }}>Fresh</span>
             <span className="hero-stat-label" style={{ fontFamily: "var(--font-dm)", fontSize: "clamp(10px, 0.6vw, 13px)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.20em", color: "#8C5A35" }}>Made Daily</span>
           </div>
         </div>

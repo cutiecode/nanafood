@@ -22,7 +22,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: "Categories & Menu", href: "/admin/menu", icon: UtensilsCrossed },
     { label: "Drinks & Desserts", href: "/admin/addons", icon: GlassWater },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
-    { label: "Insights", href: "/admin/insights", icon: TrendingUp },
     { label: "Profile", href: "/admin/profile", icon: UserCircle },
   ];
 

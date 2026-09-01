@@ -223,20 +223,47 @@ input[type="number"] {
     line-height: 1.1 !important;
   }
 
+  /* Better responsive title sizing for very small screens */
+  .hero-content h1 .hero-title-line:first-child {
+    font-size: clamp(1.25rem, 6vw, 2rem) !important;
+  }
+
+  .hero-content h1 .hero-title-line:last-child {
+    font-size: clamp(1.5rem, 7vw, 2.6rem) !important;
+    white-space: nowrap !important;
+  }
+
+
+  /* Layout and sizing adjustments for hero stats on mobile */
   .hero-stats {
     width: 100%;
     flex-wrap: nowrap !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-    margin-bottom: 0.5rem !important;
+    justify-content: flex-start !important;
+    gap: 1rem !important;
+    margin-bottom: 0.75rem !important;
+    padding-left: 0.5rem !important;
+  }
+
+  /* Only nudge the 2nd and 3rd stat left so the first (100%) stays visually anchored */
+  .hero-stats > div:nth-child(2),
+  .hero-stats > div:nth-child(3) {
+    margin-left: -10px !important;
   }
 
   .hero-stat-value {
-    font-size: 0.85rem !important;
+    font-size: clamp(1rem, 6vw, 1.75rem) !important;
+    line-height: 1 !important;
   }
 
   .hero-stat-label {
-    font-size: 6px !important;
+    font-size: 0.65rem !important;
+  }
+
+  /* Lower the bottom fade slightly so it doesn't overlap hero content on small screens */
+  .hero-bottom-fade {
+    bottom: -36px !important;
+    height: 200px !important;
+    pointer-events: none !important;
   }
 
   .hero-search-shell {
