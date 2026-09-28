@@ -107,6 +107,37 @@ model AdminLoginAttempt {
   updatedAt      DateTime  @updatedAt
 }
 
+model AdminActionLog {
+  id        String   @id @default(cuid())
+  action    String
+  entityId  String?
+  ip        String?
+  detail    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action])
+}
+
+model ErrorLog {
+  id        String   @id @default(cuid())
+  route     String
+  message   String
+  stack     String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// Singleton, mirrors the Settings pattern. Kept separate from Settings (which
+// is returned by the public, unauthenticated GET /api/settings) so the
+// password hash is never at risk of being serialized into a public response.
+model Admin {
+  id           String   @id @default("default")
+  passwordHash String
+  updatedAt    DateTime @updatedAt
+}
+
 model Settings {
   id             String  @id @default("default")
   restaurantName String  @default("Nana-AfricanFood")

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -28,14 +29,23 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       where: { id },
       data: { label, description: description || null, ...(order !== undefined ? { order } : {}) },
     });
+
+    await logAdminAction({
+      action: "category.update",
+      entityId: category.id,
+      ip: getClientIp(req),
+      detail: category.label,
+    });
+
     return NextResponse.json(category);
   } catch (error) {
     console.error("UPDATE CATEGORY ERROR:", error);
+    await logError({ route: "PUT /api/categories/[id]", error });
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
@@ -48,11 +58,19 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
     }
 
     await prisma.dish.deleteMany({ where: { categoryId: id } });
-    await prisma.category.delete({ where: { id } });
+    const category = await prisma.category.delete({ where: { id } });
+
+    await logAdminAction({
+      action: "category.delete",
+      entityId: id,
+      ip: getClientIp(req),
+      detail: category.label,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE CATEGORY ERROR:", error);
+    await logError({ route: "DELETE /api/categories/[id]", error });
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }

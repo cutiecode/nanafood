@@ -10,7 +10,6 @@ type Settings = {
   phone: string;
   address: string;
   hours: string;
-  taxRate: string;
   instagram: string;
   facebook: string;
   whatsapp: string;
@@ -25,7 +24,6 @@ export default function AdminProfile() {
     phone: "+1 (720) 000-0000",
     address: "Denver, CO 80202",
     hours: "Mon–Sun · 11am – 10pm",
-    taxRate: "8.81",
     instagram: "",
     facebook: "",
     whatsapp: "",
@@ -50,7 +48,7 @@ export default function AdminProfile() {
       try {
         const res = await fetch("/api/settings");
         const data = await res.json();
-        setSettings({ ...data, taxRate: String(data.taxRate) });
+        setSettings(data);
       } catch (error) {
         console.error("Failed to fetch settings:", error);
       } finally {
@@ -80,16 +78,12 @@ export default function AdminProfile() {
   const handleRestaurantSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setRestaurantError("");
-    if (parseFloat(settings.taxRate) < 0 || isNaN(parseFloat(settings.taxRate))) {
-      setRestaurantError("Tax rate can't be negative.");
-      return;
-    }
     setIsSavingSettings(true);
     try {
       const res = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...settings, taxRate: parseFloat(settings.taxRate) }),
+        body: JSON.stringify(settings),
       });
       if (!res.ok) {
         setRestaurantError("Failed to save settings.");
@@ -117,13 +111,14 @@ export default function AdminProfile() {
     }
     setIsLoadingPassword(true);
     try {
-      const res = await fetch("/api/admin/auth", {
-        method: "POST",
+      const res = await fetch("/api/admin/password", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: passwordForm.current }),
+        body: JSON.stringify({ currentPassword: passwordForm.current, newPassword: passwordForm.newPassword }),
       });
       if (!res.ok) {
-        setPasswordError("Current password is incorrect.");
+        const data = await res.json().catch(() => ({}));
+        setPasswordError(data.error || "Current password is incorrect.");
         return;
       }
       setPasswordSuccess(true);
@@ -261,13 +256,6 @@ export default function AdminProfile() {
               <label style={labelStyle}>Opening Hours</label>
               <input style={inputStyle} value={settings.hours} onChange={(e) => setSettings((p) => ({ ...p, hours: e.target.value }))} onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
             </div>
-            <div>
-              <label style={labelStyle}>
-                Tax Rate (%)
-                <span style={{ color: "#DB9217", fontWeight: 300, textTransform: "none", letterSpacing: 0, marginLeft: "0.5rem", fontSize: "10px" }}>Denver default: 8.81%</span>
-              </label>
-              <input style={{ ...inputStyle, appearance: "none" }} type="number" step="0.01" min="0" value={settings.taxRate} onChange={(e) => setSettings((p) => ({ ...p, taxRate: e.target.value }))} onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(194,61,12,0.50)")} onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(219,146,23,0.30)")} />
-            </div>
           </div>
 
           {/* Social media */}
@@ -390,35 +378,6 @@ export default function AdminProfile() {
             </button>
           </div>
         </form>
-      </div>
-
-      {/* Danger zone */}
-      <div className="admin-form-card" style={{ ...cardStyle, border: "1px solid rgba(194,61,12,0.25)" }}>
-        <div>
-          <h2 className="admin-card-title" style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.2rem", color: "#C23D0C", marginBottom: "0.25rem" }}>
-            Danger Zone
-          </h2>
-          <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09", fontWeight: 300 }}>
-            These actions are irreversible. Proceed with caution.
-          </p>
-        </div>
-        <div className="admin-danger-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1rem", borderRadius: "10px", background: "rgba(194,61,12,0.05)", border: "1px solid rgba(194,61,12,0.15)" }}>
-          <div>
-            <p style={{ fontFamily: "var(--font-dm)", fontWeight: 500, fontSize: "0.875rem", color: "#743306", marginBottom: "0.2rem" }}>
-              Clear all orders
-            </p>
-            <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09", fontWeight: 300 }}>
-              Permanently delete all order history.
-            </p>
-          </div>
-          <button
-            style={{ padding: "0.6rem 1.25rem", borderRadius: "100px", background: "transparent", border: "1px solid rgba(194,61,12,0.35)", color: "#C23D0C", fontFamily: "var(--font-dm)", fontSize: "0.8rem", fontWeight: 500, cursor: "pointer", transition: "all 0.2s", flexShrink: 0 }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(194,61,12,0.10)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-          >
-            Clear Orders
-          </button>
-        </div>
       </div>
 
     </div>

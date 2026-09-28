@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -85,9 +86,17 @@ export async function POST(req: NextRequest) {
 
     await writeFile(filepath, buffer);
 
+    await logAdminAction({
+      action: "upload.create",
+      entityId: generatedName,
+      ip: getClientIp(req),
+      detail: `${detected.mime}, ${buffer.length} bytes`,
+    });
+
     return NextResponse.json({ url: `/dishes/${generatedName}` });
   } catch (error) {
     console.error("Upload error:", error);
+    await logError({ route: "POST /api/upload", error });
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }

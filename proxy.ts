@@ -31,7 +31,8 @@ export function proxy(req: NextRequest) {
     (pathname === "/api/desserts" || pathname.startsWith("/api/desserts/")) && method !== "GET" ||
     pathname === "/api/upload" ||
     (pathname === "/api/settings" && method !== "GET") ||
-    pathname === "/api/orders";
+    pathname === "/api/orders" ||
+    pathname === "/api/admin/password";
 
   // Anything matched by config.matcher below that isn't an admin page and
   // isn't a protected API call (e.g. a public GET) passes through untouched.
@@ -60,5 +61,6 @@ export const config = {
     "/api/upload",
     "/api/settings",
     "/api/orders",
+    "/api/admin/password",
   ],
 };

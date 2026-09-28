@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { hashPassword, verifyPassword } from "@/lib/password";
 
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000;
 const LOCKOUT_MS = 15 * 60 * 1000;
 
-// Compares two strings in constant time. Hashing first normalizes both
-// inputs to a fixed 32-byte digest before the constant-time compare, so
-// neither the password's length nor which character first differs can leak
-// through response timing (a direct string compare, or timingSafeEqual on
-// the raw — variable-length — strings, both leak that information).
-function timingSafeStringEqual(a: string, b: string): boolean {
-  const hashA = crypto.createHash("sha256").update(a).digest();
-  const hashB = crypto.createHash("sha256").update(b).digest();
-  return crypto.timingSafeEqual(hashA, hashB);
-}
-
-// x-forwarded-for is set by Vercel's edge network on real deployments. It's
+// x-forwarded-for is set by the platform's edge/proxy on real deployments. It's
 // client-spoofable on a bare Node server with no trusted proxy in front, so
 // this isn't a bulletproof identifier — but it's the standard signal and
 // still meaningfully raises the cost of brute-forcing.
@@ -28,12 +17,6 @@ function getClientIp(req: NextRequest): string {
 }
 
 export async function POST(req: NextRequest) {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) {
-    console.error("ADMIN_PASSWORD is not configured.");
-    return NextResponse.json({ error: "Admin login is not configured." }, { status: 500 });
-  }
-
   const ip = getClientIp(req);
   const now = new Date();
 
@@ -48,6 +31,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Lazily seed the Admin record from ADMIN_PASSWORD on first-ever use — from
+  // then on, the stored hash is the sole source of truth and the env var is
+  // no longer consulted (changing password via AdminProfile updates the hash).
+  let admin = await prisma.admin.findUnique({ where: { id: "default" } });
+  if (!admin) {
+    const bootstrapPassword = process.env.ADMIN_PASSWORD;
+    if (!bootstrapPassword) {
+      console.error("No Admin record exists and ADMIN_PASSWORD is not set to seed one.");
+      return NextResponse.json({ error: "Admin login is not configured." }, { status: 500 });
+    }
+    admin = await prisma.admin.create({
+      data: { id: "default", passwordHash: hashPassword(bootstrapPassword) },
+    });
+  }
+
   let password: unknown;
   try {
     ({ password } = await req.json());
@@ -57,7 +55,7 @@ export async function POST(req: NextRequest) {
 
   const candidate = typeof password === "string" ? password : "";
 
-  if (timingSafeStringEqual(candidate, expected)) {
+  if (verifyPassword(candidate, admin.passwordHash)) {
     if (attempt) {
       await prisma.adminLoginAttempt.delete({ where: { ip } }).catch(() => {});
     }

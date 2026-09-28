@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 export async function GET() {
   try {
@@ -28,9 +29,13 @@ export async function POST(req: Request) {
     const drink = await prisma.drink.create({
       data: { name, price, imageUrl: body.imageUrl || null },
     });
+
+    await logAdminAction({ action: "drink.create", entityId: drink.id, ip: getClientIp(req), detail: drink.name });
+
     return NextResponse.json(drink);
   } catch (error) {
     console.error(error);
+    await logError({ route: "POST /api/drinks", error });
     return NextResponse.json({ error: "Failed to create drink" }, { status: 500 });
   }
 }
@@ -54,9 +59,13 @@ export async function PUT(req: Request) {
       where: { id },
       data: { name, price, imageUrl: body.imageUrl || null },
     });
+
+    await logAdminAction({ action: "drink.update", entityId: drink.id, ip: getClientIp(req), detail: drink.name });
+
     return NextResponse.json(drink);
   } catch (error) {
     console.error(error);
+    await logError({ route: "PUT /api/drinks", error });
     return NextResponse.json({ error: "Failed to update drink" }, { status: 500 });
   }
 }
@@ -68,10 +77,14 @@ export async function DELETE(req: Request) {
     if (!id) {
       return NextResponse.json({ error: "Drink id is required." }, { status: 400 });
     }
-    await prisma.drink.delete({ where: { id } });
+    const drink = await prisma.drink.delete({ where: { id } });
+
+    await logAdminAction({ action: "drink.delete", entityId: id, ip: getClientIp(req), detail: drink.name });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
+    await logError({ route: "DELETE /api/drinks", error });
     return NextResponse.json({ error: "Failed to delete drink" }, { status: 500 });
   }
 }

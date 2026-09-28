@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizeDishPayload } from "@/lib/menu-dish-payload";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -53,6 +54,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
 
+    await logAdminAction({
+      action: "dish.update",
+      entityId: dish.id,
+      ip: getClientIp(req),
+      detail: dish.name,
+    });
+
     return NextResponse.json({
       ...dish,
       drinks: dish.dishDrinks.map((dd) => dd.drink),
@@ -60,17 +68,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     });
   } catch (error) {
     console.error(error);
+    await logError({ route: "PUT /api/menu/[id]", error });
     return NextResponse.json({ error: "Failed to update dish." }, { status: 500 });
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    await prisma.dish.delete({ where: { id } });
+    const dish = await prisma.dish.delete({ where: { id } });
+
+    await logAdminAction({
+      action: "dish.delete",
+      entityId: id,
+      ip: getClientIp(req),
+      detail: dish.name,
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
+    await logError({ route: "DELETE /api/menu/[id]", error });
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }

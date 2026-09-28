@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizeDishPayload } from "@/lib/menu-dish-payload";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 export async function GET() {
   try {
@@ -50,6 +51,13 @@ export async function POST(req: Request) {
       },
     });
 
+    await logAdminAction({
+      action: "dish.create",
+      entityId: dish.id,
+      ip: getClientIp(req),
+      detail: dish.name,
+    });
+
     return NextResponse.json({
       ...dish,
       drinks: dish.dishDrinks.map((dd) => dd.drink),
@@ -57,6 +65,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error(error);
+    await logError({ route: "POST /api/menu", error });
     return NextResponse.json({ error: "Failed to save dish." }, { status: 500 });
   }
 }

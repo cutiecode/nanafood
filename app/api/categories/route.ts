@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 export async function GET() {
   try {
@@ -46,9 +47,18 @@ export async function POST(req: Request) {
     const category = await prisma.category.create({
       data: { label, description: description || null, order },
     });
+
+    await logAdminAction({
+      action: "category.create",
+      entityId: category.id,
+      ip: getClientIp(req),
+      detail: category.label,
+    });
+
     return NextResponse.json(category);
   } catch (error) {
     console.error("CREATE CATEGORY ERROR:", error);
+    await logError({ route: "POST /api/categories", error });
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }

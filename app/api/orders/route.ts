@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 export async function GET() {
   try {
@@ -23,9 +24,18 @@ export async function PATCH(req: Request) {
       where: { id },
       data: { processed },
     });
+
+    await logAdminAction({
+      action: processed ? "order.mark_processed" : "order.mark_unprocessed",
+      entityId: order.id,
+      ip: getClientIp(req),
+      detail: order.orderNumber,
+    });
+
     return NextResponse.json(order);
   } catch (error) {
     console.error(error);
+    await logError({ route: "PATCH /api/orders", error });
     return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
   }
 }

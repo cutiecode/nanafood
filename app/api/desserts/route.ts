@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 export async function GET() {
   try {
@@ -28,9 +29,13 @@ export async function POST(req: Request) {
     const dessert = await prisma.dessert.create({
       data: { name, price, imageUrl: body.imageUrl || null },
     });
+
+    await logAdminAction({ action: "dessert.create", entityId: dessert.id, ip: getClientIp(req), detail: dessert.name });
+
     return NextResponse.json(dessert);
   } catch (error) {
     console.error(error);
+    await logError({ route: "POST /api/desserts", error });
     return NextResponse.json({ error: "Failed to create dessert" }, { status: 500 });
   }
 }
@@ -54,9 +59,13 @@ export async function PUT(req: Request) {
       where: { id },
       data: { name, price, imageUrl: body.imageUrl || null },
     });
+
+    await logAdminAction({ action: "dessert.update", entityId: dessert.id, ip: getClientIp(req), detail: dessert.name });
+
     return NextResponse.json(dessert);
   } catch (error) {
     console.error(error);
+    await logError({ route: "PUT /api/desserts", error });
     return NextResponse.json({ error: "Failed to create dessert" }, { status: 500 });
   }
 }
@@ -68,10 +77,14 @@ export async function DELETE(req: Request) {
     if (!id) {
       return NextResponse.json({ error: "Dessert id is required." }, { status: 400 });
     }
-    await prisma.dessert.delete({ where: { id } });
+    const dessert = await prisma.dessert.delete({ where: { id } });
+
+    await logAdminAction({ action: "dessert.delete", entityId: id, ip: getClientIp(req), detail: dessert.name });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
+    await logError({ route: "DELETE /api/desserts", error });
     return NextResponse.json({ error: "Failed to delete dessert" }, { status: 500 });
   }
 }

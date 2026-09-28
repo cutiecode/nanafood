@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, logAdminAction, logError } from "@/lib/log";
 
 export async function GET() {
   try {
@@ -52,9 +53,18 @@ export async function PUT(req: Request) {
       update: data,
       create: { id: "default", ...data },
     });
+
+    await logAdminAction({
+      action: "settings.update",
+      entityId: settings.id,
+      ip: getClientIp(req),
+      detail: settings.restaurantName,
+    });
+
     return NextResponse.json(settings);
   } catch (error) {
     console.error(error);
+    await logError({ route: "PUT /api/settings", error });
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
