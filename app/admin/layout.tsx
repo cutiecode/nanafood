@@ -10,11 +10,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  if (pathname === "/admin") return <>{children}</>;
+  if (pathname === "/admin" || pathname === "/admin/login") return <>{children}</>;
 
   const handleLogout = async () => {
     await fetch("/api/admin/auth", { method: "DELETE" });
-    router.push("/admin");
+    router.push("/admin/login");
   };
 
   const navItems = [

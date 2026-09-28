@@ -98,6 +98,14 @@ model Order {
   createdAt   DateTime @default(now())
 }
 
+model AdminLoginAttempt {
+  ip             String    @id
+  failCount      Int       @default(0)
+  firstFailureAt DateTime  @default(now())
+  lockedUntil    DateTime?
+  updatedAt      DateTime  @updatedAt
+}
+
 model Settings {
   id             String  @id @default("default")
   restaurantName String  @default("Nana-AfricanFood")
