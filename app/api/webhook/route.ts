@@ -37,6 +37,10 @@ export async function POST(req: NextRequest) {
         ? session.total_details.amount_discount / 100
         : null;
 
+      const taxAmount = session.total_details?.amount_tax
+        ? session.total_details.amount_tax / 100
+        : null;
+
       const note = session.metadata?.note || "";
 
       const now = new Date();
@@ -55,6 +59,7 @@ export async function POST(req: NextRequest) {
             ? `${session.customer_details.address.line1}, ${session.customer_details.address.city} ${session.customer_details.address.postal_code}`
             : null,
           discount,
+          taxAmount,
           note,
         },
       });

@@ -93,6 +93,7 @@ model Order {
   phone       String?
   address     String?
   discount    Float?
+  taxAmount   Float?
   note        String?  @default("")
   processed   Boolean  @default(false)
   createdAt   DateTime @default(now())
@@ -114,7 +115,6 @@ model Settings {
   phone          String  @default("+1 (720) 000-0000")
   address        String  @default("Denver, CO 80202")
   hours          String  @default("Mon–Sun · 11am – 10pm")
-  taxRate        Float   @default(8.81)
   instagram      String  @default("")
   facebook       String  @default("")
   whatsapp       String  @default("")

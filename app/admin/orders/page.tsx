@@ -11,6 +11,7 @@ type Order = {
   phone?: string;
   address?: string;
   discount?: number;
+  taxAmount?: number;
   note?: string;
   createdAt: string;
   processed: boolean;
@@ -306,11 +307,11 @@ export default function AdminOrders() {
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                           <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09" }}>Subtotal</span>
-                          <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#743306" }}>${(order.amount / 1.0881).toFixed(2)}</span>
+                          <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#743306" }}>${(Number(order.amount) - Number(order.taxAmount || 0)).toFixed(2)}</span>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09" }}>Tax (8.81%)</span>
-                          <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09" }}>${(order.amount - order.amount / 1.0881).toFixed(2)}</span>
+                          <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09" }}>Tax</span>
+                          <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.8rem", color: "#A44B09" }}>${Number(order.taxAmount || 0).toFixed(2)}</span>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", paddingTop: "0.25rem", borderTop: "1px solid rgba(219,146,23,0.20)" }}>
                           <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", fontWeight: 500, color: "#743306" }}>Total</span>

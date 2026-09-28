@@ -9,7 +9,6 @@ type Settings = {
   phone: string;
   address: string;
   hours: string;
-  taxRate: number;
   instagram: string;
   facebook: string;
   whatsapp: string;
@@ -23,7 +22,6 @@ const defaultSettings: Settings = {
   phone: "+1 (720) 000-0000",
   address: "Denver, CO 80202",
   hours: "Mon–Sun · 11am – 10pm",
-  taxRate: 8.81,
   instagram: "",
   facebook: "",
   whatsapp: "",

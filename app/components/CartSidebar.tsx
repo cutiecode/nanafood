@@ -3,22 +3,41 @@
 import { useState } from "react";
 import { X, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
-import { useSettings } from "@/app/context/SettingsContext";
+
+// Standalone drinks/desserts are added to the cart as a "fake dish" whose
+// category.id is the sentinel "drink"/"dessert" (see MenuSection.tsx). Real
+// dishes always have a real Category id (a cuid), which can never collide
+// with these two literals.
+const resolveItemKind = (dish: unknown): "dish" | "drink" | "dessert" => {
+  const category = (dish as { category?: { id?: string } } | null | undefined)?.category;
+  if (category?.id === "drink") return "drink";
+  if (category?.id === "dessert") return "dessert";
+  return "dish";
+};
 
 export default function CartSidebar() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, totalPrice, totalItems, clearCart, note, setNote } = useCart();
-  const settings = useSettings();
-  const taxRate = settings.taxRate / 100;
-  const taxMultiplier = 1 + taxRate;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCheckout = async () => {
     setIsLoading(true);
     try {
+      // Only IDs + quantity are sent — never a price. /api/checkout looks up
+      // every price server-side so a tampered client payload can't change
+      // what's actually charged.
+      const payload = {
+        note,
+        items: items.map((item) => ({
+          dishId: item.dish.id,
+          kind: resolveItemKind(item.dish),
+          quantity: item.quantity,
+          extraIds: item.selectedSupplements.map((s) => s.id),
+        })),
+      };
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, note }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.url) {
@@ -178,19 +197,14 @@ export default function CartSidebar() {
               <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09" }}>Subtotal</span>
               <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#743306" }}>${totalPrice.toFixed(2)}</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
-              <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09" }}>
-                Tax ({settings.taxRate}% - {settings.address.split(",")[1]?.trim() || "Denver, CO"})
-              </span>
-              <span style={{ fontFamily: "var(--font-dm)", fontSize: "0.875rem", color: "#A44B09" }}>
-                ${(totalPrice * taxRate).toFixed(2)}
-              </span>
-            </div>
+            <p style={{ fontFamily: "var(--font-dm)", fontSize: "0.75rem", color: "#DB9217", fontWeight: 300 }}>
+              Tax is calculated and collected at checkout.
+            </p>
             <div style={{ borderTop: "1px solid rgba(219,146,23,0.20)" }} />
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontFamily: "var(--font-dm)", fontWeight: 500, fontSize: "0.95rem", color: "#743306" }}>Total</span>
               <span style={{ fontFamily: "var(--font-playfair)", fontWeight: 700, fontSize: "1.4rem", color: "#743306" }}>
-                ${(totalPrice * taxMultiplier).toFixed(2)}
+                ${totalPrice.toFixed(2)}
               </span>
             </div>
             <button
@@ -201,7 +215,7 @@ export default function CartSidebar() {
               onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
             >
               <span>{isLoading ? "Redirecting to payment..." : "Proceed to Checkout"}</span>
-              {!isLoading && <span style={{ fontWeight: 700 }}>${(totalPrice * taxMultiplier).toFixed(2)}</span>}
+              {!isLoading && <span style={{ fontWeight: 700 }}>${totalPrice.toFixed(2)}</span>}
             </button>
             <button
               onClick={clearCart}
