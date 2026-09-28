@@ -97,17 +97,30 @@ export async function normalizeDishPayload(body: DishPayloadInput): Promise<Dish
 
   if (body.discountPercent !== null && body.discountPercent !== undefined && body.discountPercent !== "") {
     const discountValue = Number(body.discountPercent);
-    if (!Number.isFinite(discountValue) || discountValue < 0) {
-      return { ok: false, status: 400, error: "Discount can't be negative." };
+    if (!Number.isFinite(discountValue) || discountValue < 0 || discountValue > 100) {
+      return { ok: false, status: 400, error: "Discount must be a percentage between 0 and 100." };
     }
   }
 
+  let feeds = 1;
+  if (body.feeds !== null && body.feeds !== undefined && body.feeds !== "") {
+    const feedsValue = Number(body.feeds);
+    if (!Number.isInteger(feedsValue) || feedsValue < 1) {
+      return { ok: false, status: 400, error: "Feeds must be a whole number of at least 1." };
+    }
+    feeds = feedsValue;
+  }
+
   if (Array.isArray(body.supplements)) {
-    const hasNegativeSupplement = body.supplements.some(
-      (supplement) => supplement?.price !== null && supplement?.price !== undefined && Number(supplement.price) < 0
-    );
-    if (hasNegativeSupplement) {
-      return { ok: false, status: 400, error: "Add-on price can't be negative." };
+    for (const supplement of body.supplements) {
+      const supplementName = typeof supplement?.name === "string" ? supplement.name.trim() : "";
+      if (!supplementName) {
+        return { ok: false, status: 400, error: "Each add-on needs a name." };
+      }
+      const supplementPrice = Number(supplement?.price);
+      if (!Number.isFinite(supplementPrice) || supplementPrice < 0) {
+        return { ok: false, status: 400, error: `Add-on "${supplementName}" must have a valid, non-negative price.` };
+      }
     }
   }
 
@@ -163,13 +176,12 @@ export async function normalizeDishPayload(body: DishPayloadInput): Promise<Dish
     }
   }
 
+  // Every entry was already validated above, so this just extracts clean values.
   const supplements = Array.isArray(body.supplements)
-    ? body.supplements
-        .map((supplement) => ({
-          name: typeof supplement?.name === "string" ? supplement.name.trim() : "",
-          price: Number(supplement?.price),
-        }))
-        .filter((supplement) => supplement.name && Number.isFinite(supplement.price))
+    ? body.supplements.map((supplement) => ({
+        name: (typeof supplement?.name === "string" ? supplement.name : "").trim(),
+        price: Number(supplement?.price),
+      }))
     : [];
 
   return {
@@ -184,7 +196,7 @@ export async function normalizeDishPayload(body: DishPayloadInput): Promise<Dish
       imageUrl: typeof body.imageUrl === "string" && body.imageUrl.trim() ? body.imageUrl : null,
       popular: Boolean(body.popular),
       spiceable: Boolean(body.spiceable),
-      feeds: Number(body.feeds) > 0 ? Number(body.feeds) : 1,
+      feeds,
       categoryId,
       supplements: {
         create: supplements,

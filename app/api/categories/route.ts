@@ -26,9 +26,25 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { label, description, order } = await req.json();
+    const body = await req.json();
+    const label = typeof body.label === "string" ? body.label.trim() : "";
+    if (!label) {
+      return NextResponse.json({ error: "Category name is required." }, { status: 400 });
+    }
+
+    const description = typeof body.description === "string" ? body.description.trim() : "";
+
+    let order = 0;
+    if (body.order !== null && body.order !== undefined && body.order !== "") {
+      const orderValue = Number(body.order);
+      if (!Number.isInteger(orderValue) || orderValue < 0) {
+        return NextResponse.json({ error: "Order must be a whole number of 0 or more." }, { status: 400 });
+      }
+      order = orderValue;
+    }
+
     const category = await prisma.category.create({
-      data: { label, description, order: order || 0 },
+      data: { label, description: description || null, order },
     });
     return NextResponse.json(category);
   } catch (error) {

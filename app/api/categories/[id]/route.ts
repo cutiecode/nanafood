@@ -4,10 +4,29 @@ import { prisma } from "@/lib/prisma";
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const { label, description, order } = await req.json();
+    const body = await req.json();
+
+    const label = typeof body.label === "string" ? body.label.trim() : "";
+    if (!label) {
+      return NextResponse.json({ error: "Category name is required." }, { status: 400 });
+    }
+
+    const description = typeof body.description === "string" ? body.description.trim() : "";
+
+    // The admin "edit category" form only sends label/description — order is
+    // only touched when the caller actually provides it.
+    let order: number | undefined;
+    if (body.order !== null && body.order !== undefined && body.order !== "") {
+      const orderValue = Number(body.order);
+      if (!Number.isInteger(orderValue) || orderValue < 0) {
+        return NextResponse.json({ error: "Order must be a whole number of 0 or more." }, { status: 400 });
+      }
+      order = orderValue;
+    }
+
     const category = await prisma.category.update({
       where: { id },
-      data: { label, description, order },
+      data: { label, description: description || null, ...(order !== undefined ? { order } : {}) },
     });
     return NextResponse.json(category);
   } catch (error) {
