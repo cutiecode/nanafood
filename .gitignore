@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local dev database (never the source of truth — Turso is)
+/prisma/dev.db
+
 # vercel
 .vercel
 
